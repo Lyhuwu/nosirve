@@ -3,33 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Para mi arrocito</title>
+  <title>Mi lienzo 3D</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      height: 100%;
-      overflow: hidden;
-    }
-
+    body { margin: 0; overflow: hidden; background: #000; height: 100%; }
+    
+    /* Contenedor del lienzo de Kinopio */
     .kinopio-embed {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100dvh; /* ✅ Evita el borde negro en móviles */
-      overflow: hidden;
-    }
-
-    iframe {
       width: 100%;
       height: 100%;
-      border: none;
-      transform: scale(1); /* Puedes ajustar este valor si necesitas zoom */
-      transform-origin: center;
+      z-index: 2; /* Lienzo de Kinopio encima */
     }
 
+    /* Contenedor de Three.js, por debajo de Kinopio */
+    #threeCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1; /* Three.js debajo del lienzo */
+    }
+
+    /* Mensaje de amor, si lo quieres mantener */
     .mensaje-amor {
       position: fixed;
       top: 20%;
@@ -43,7 +41,7 @@
       border: 4px solid #ff69b4;
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
-      z-index: 999;
+      z-index: 3;
       animation: fadeOut 2s ease-out 5s forwards;
     }
 
@@ -54,6 +52,7 @@
       }
     }
 
+    /* Botón de música */
     .boton-musica {
       position: fixed;
       bottom: 20px;
@@ -77,23 +76,65 @@
   </style>
 </head>
 <body>
+  <div class="mensaje-amor">Para mi arrocito, mi amor, mi seyora, mi reina, mi todo</div>
 
-  <div class="mensaje-amor">
-    Para mi arrocito, mi amor, mi seyora, mi reina, mi todo
-  </div>
+  <!-- Contenedor para Three.js -->
+  <div id="threeCanvas"></div>
 
+  <!-- Contenedor de Kinopio -->
   <div class="kinopio-embed">
-    <iframe 
-      src="https://kinopio.club/embed/?spaceId=8UGIFw8MmL2t1Dfgz-GUE&zoom=98"
-      allowfullscreen>
-    </iframe>
+    <iframe src="https://kinopio.club/embed/?spaceId=8UGIFw8MmL2t1Dfgz-GUE&zoom=98" style="height: 100%; width: 100%; border: 0; border-radius: 6px;"></iframe>
   </div>
 
+  <!-- Audio -->
   <audio id="musica" src="https://lyhuwu.github.io/Para-Anita-/audio/if-ain_t-got-you-Alicia-Keys-_Lyrics-Español_Inglés_-SlaterArt.mp3" loop></audio>
 
+  <!-- Botón de música -->
   <button id="botonMusica" class="boton-musica">🎵 Reproducir música</button>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    // Configuración de Three.js
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('threeCanvas').appendChild(renderer.domElement);
+
+    // Añadir estrellas al fondo
+    const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
+    const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const stars = [];
+    for (let i = 0; i < 1000; i++) {
+      const star = new THREE.Mesh(starGeometry, starMaterial);
+      star.position.set(
+        Math.random() * 2000 - 1000,
+        Math.random() * 2000 - 1000,
+        Math.random() * 2000 - 1000
+      );
+      stars.push(star);
+      scene.add(star);
+    }
+
+    camera.position.z = 5;
+
+    // Animación
+    function animate() {
+      requestAnimationFrame(animate);
+      scene.rotation.x += 0.0005;
+      scene.rotation.y += 0.001;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Ajuste de tamaño con el cambio de ventana
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+
+    // Reproducir música
     const musica = document.getElementById("musica");
     const boton = document.getElementById("botonMusica");
 
@@ -107,6 +148,5 @@
       }
     });
   </script>
-
 </body>
 </html>
