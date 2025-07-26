@@ -59,9 +59,17 @@
     const canvasURL = 'https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas';
 
     Promise.all([fetch(jsonURL), fetch(canvasURL)])
-      .then(([jsonRes, canvasRes]) => Promise.all([jsonRes.json(), canvasRes.json()]))
+      .then(([jsonRes, canvasRes]) => {
+        if (!jsonRes.ok || !canvasRes.ok) {
+          throw new Error('Error al cargar los archivos');
+        }
+        return Promise.all([jsonRes.json(), canvasRes.json()]);
+      })
       .then(([jsonData, canvasData]) => {
         const canvasElement = document.getElementById('canvas');
+        
+        console.log("Datos del JSON:", jsonData); // Depuración: ver datos del JSON
+        console.log("Datos del Canvas:", canvasData); // Depuración: ver datos del Canvas
 
         // Procesar los nodos del JSON
         jsonData.nodes.forEach(node => {
