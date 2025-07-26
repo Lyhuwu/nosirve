@@ -6,71 +6,57 @@
   <style>
     body {
       margin: 0;
-      background: #fef0f8;
-      font-family: sans-serif;
+      background: #f9f9f9;
     }
 
     #canvas {
       position: relative;
       width: 3000px;
       height: 2000px;
+      background: white;
       margin: 50px auto;
       border: 2px dashed pink;
-      background: white;
+      overflow: visible;
     }
 
     .node {
       position: absolute;
       box-sizing: border-box;
       border-radius: 16px;
-      padding: 10px;
+      padding: 12px;
+      background-color: #d6ecff; /* azulito suave */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* sombra tenue */
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 15px;
+      color: #333;
+      max-width: 320px;
       white-space: pre-wrap;
       overflow-wrap: break-word;
-      background: #d6eaff; /* azul suave */
-      border: none;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
-      color: #333;
     }
 
     .node img {
       display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 0;
-    }
-
-    .image-node {
-      padding: 0;
-      border: none;
-      background: none;
-      box-shadow: none;
-      border-radius: 0;
-    }
-
-    iframe.spotify-embed {
       border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      height: 152px;
-      border: none;
+      max-width: 100%;
+      height: auto;
+      margin: 0;
     }
 
-    a.link-button {
+    .button-link {
       display: inline-block;
-      padding: 10px 15px;
-      background-color: #a29bfe;
+      padding: 10px 16px;
+      background-color: #1db954;
       color: white;
-      border-radius: 10px;
       text-decoration: none;
+      border-radius: 30px;
       font-weight: bold;
-      font-size: 14px;
-      box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
-      transition: background 0.2s ease;
+      margin-top: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.2s ease;
     }
 
-    a.link-button:hover {
-      background-color: #8e82f0;
+    .button-link:hover {
+      background-color: #17a44d;
     }
   </style>
 </head>
@@ -82,40 +68,35 @@
       .then(res => res.json())
       .then(data => {
         const canvas = document.getElementById('canvas');
+
         data.nodes.forEach(node => {
-          const text = node.text.trim();
           const div = document.createElement('div');
-          const isImage = text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('media') || text.includes('cdn.kinopio');
-
           div.className = 'node';
-          if (isImage) div.classList.add('image-node');
-
           div.style.left = node.x + 'px';
           div.style.top = node.y + 'px';
-          div.style.width = node.width + 'px';
-          div.style.height = node.height + 'px';
 
-          if (isImage) {
+          const text = node.text.trim();
+
+          // Mostrar imagen si es una URL válida
+          if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('cdn.kinopio')) {
             const img = document.createElement('img');
             img.src = text;
             div.appendChild(img);
-          } else if (text.includes('open.spotify.com/track/')) {
-            const trackId = text.split('/track/')[1].split('?')[0];
-            const iframe = document.createElement('iframe');
-            iframe.className = 'spotify-embed';
-            iframe.src = `https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`;
-            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            iframe.loading = 'lazy';
-            div.appendChild(iframe);
-          } else if (text.startsWith('http')) {
-            const link = document.createElement('a');
-            link.href = text;
-            link.target = '_blank';
-            link.className = 'link-button';
-            link.textContent = '🌐 Ver página';
-            div.appendChild(link);
-          } else {
-            div.textContent = text;
+          }
+
+          // Link a Spotify o GitHub u otro
+          else if (text.includes('open.spotify.com') || text.includes('github.io')) {
+            const a = document.createElement('a');
+            a.href = text;
+            a.target = '_blank';
+            a.className = 'button-link';
+            a.innerText = text.includes('spotify') ? '🎵 Escuchar en Spotify' : '🔗 Abrir enlace';
+            div.appendChild(a);
+          }
+
+          // Texto normal
+          else {
+            div.innerText = text;
           }
 
           canvas.appendChild(div);
