@@ -113,46 +113,4 @@
   </div>
 
   <div class="kinopio-embed">
-    <iframe src="https://kinopio.club/embed/?spaceId=8UGIFw8MmL2t1Dfgz-GUE&zoom=91"></iframe>
-  </div>
-
-  <audio id="musica" src="https://lyhuwu.github.io/Para-Anita-/audio/if-ain_t-got-you-Alicia-Keys-_Lyrics-Español_Inglés_-SlaterArt.mp3" loop></audio>
-
-  <button id="botonMusica" class="boton-musica">🎵 Reproducir música</button>
-
-  <script>
-    const musica = document.getElementById("musica");
-    const boton = document.getElementById("botonMusica");
-
-    boton.addEventListener("click", async () => {
-      try {
-        if (musica.paused) {
-          await musica.play();
-          boton.innerText = "🔇 Pausar música";
-
-          const elem = document.documentElement;
-          if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-          } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-          } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-          }
-
-        } else {
-          musica.pause();
-          boton.innerText = "🎵 Reproducir música";
-        }
-      } catch (error) {
-        alert("No se pudo reproducir la música: " + error.message);
-      }
-    });
-
-    const emojis = ['💜', '💙'];
-    for (let i = 0; i < 30; i++) {
-      const emoji = document.createElement('div');
-      emoji.classList.add('emoji');
-      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      emoji.style.left = Math.random() * 100 + 'vw';
-      emoji.style.top = Math.random() * 100 + 'vh';*
-
+    <ifr
