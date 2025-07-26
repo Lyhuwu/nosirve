@@ -48,6 +48,11 @@
       max-width: 100%;
       height: auto;
     }
+    .kinopio-link {
+      color: #1DB954; /* Color de Spotify */
+      text-decoration: none;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -87,6 +92,17 @@
             } else {
               textElement.classList.add('kinopio-text');
               textElement.textContent = node.text;
+            }
+
+            // Si es un enlace de Spotify, lo convertimos en un enlace clickeable
+            if (node.text.includes("spotify.com")) {
+              const link = document.createElement('a');
+              link.href = node.text;
+              link.target = "_blank";
+              link.classList.add('kinopio-link');
+              link.textContent = "Escucha en Spotify";
+              textElement.innerHTML = ''; // Limpiar el contenido de texto
+              textElement.appendChild(link);
             }
 
             // Aplicamos las posiciones y otros estilos del nodo
