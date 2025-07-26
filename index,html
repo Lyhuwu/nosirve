@@ -2,115 +2,82 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Para mi arrocito</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ver mi Kinopio</title>
   <style>
-    html, body {
+    body {
       margin: 0;
       padding: 0;
-      height: 100%;
       overflow: hidden;
-      background: #000;
+      background: #f7f7f7;
     }
-
-    .kinopio-embed {
+    .kinopio-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: auto;
+    }
+    .kinopio-item {
       position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
     }
-
-    iframe {
-      height: 100%;
-      width: 100%;
-      border: none;
-    }
-
-    .mensaje-amor {
-      position: fixed;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%) scale(0.9);
-      background: linear-gradient(135deg, #ffe6f0, #fff);
+    .kinopio-text {
+      font-family: 'Arial', sans-serif;
       color: #000;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      font-size: 2.3em;
-      padding: 30px 40px;
-      border: 4px solid #ff69b4;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
-      z-index: 999;
-      animation: fadeOut 2s ease-out 5s forwards;
-    }
-
-    @keyframes fadeOut {
-      to {
-        opacity: 0;
-        visibility: hidden;
-      }
-    }
-
-    .boton-musica {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 12px 18px;
-      font-size: 1em;
-      background: #fff;
-      border: 2px solid #ff69b4;
-      color: #ff69b4;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #ff69b480;
-      z-index: 1000;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .boton-musica:hover {
-      background-color: #ffe6f0;
-      color: #d61b78;
-    }
-
-    .emoji {
-      position: fixed;
-      font-size: 2rem;
-      pointer-events: none;
-      animation: floatUp 10s linear forwards, fadeOut 10s forwards;
-      z-index: 998;
-    }
-
-    @keyframes floatUp {
-      from { transform: translateY(100vh); opacity: 1; }
-      to   { transform: translateY(-20vh); opacity: 0; }
-    }
-
-    #mensajeCarga {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff0fa;
-      color: #d61b78;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      font-size: 1.6em;
-      padding: 20px 30px;
-      border: 3px solid #ff69b4;
-      border-radius: 18px;
-      box-shadow: 0 0 12px rgba(255, 105, 180, 0.4);
-      z-index: 1001;
-      text-align: center;
+      font-size: 16px;
+      word-wrap: break-word;
     }
   </style>
 </head>
 <body>
 
-  <div class="mensaje-amor">
-    Para mi arrocito, mi amor, mi seyora, mi reina, mi todo
+  <h1 style="text-align: center; color: #ff69b4;">¡Bienvenido a mi espacio de Kinopio!</h1>
+
+  <div class="kinopio-container" id="kinopioContainer">
+    <!-- El contenido se añadirá aquí -->
   </div>
 
-  <div id="mensajeCarga">
-    Espera a que cargue para que puedas ver,<br>de lo contrario actualice mi bebe 💗
-  </div>
+  <script>
+    // URL del archivo .canvas en GitHub (reemplaza esta URL con tu enlace raw)
+    const canvasURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas";
 
-  <div class="kinopio-embed">
-    <ifr
+    // Función para cargar y procesar el archivo .canvas
+    fetch(canvasURL)
+      .then(response => response.json()) // Obtener el JSON
+      .then(data => {
+        // Procesar cada nodo del JSON y añadirlo al contenedor
+        const container = document.getElementById("kinopioContainer");
+
+        // Iterar sobre los nodos y crear los correspondientes en HTML
+        data.nodes.forEach(node => {
+          const kinopioItem = document.createElement('div');
+          kinopioItem.classList.add('kinopio-item');
+
+          // Si el nodo es de tipo texto, lo procesamos
+          if (node.type === "text") {
+            const textElement = document.createElement('div');
+            textElement.classList.add('kinopio-text');
+            textElement.textContent = node.text;
+
+            // Aplicamos estilo de posición (x, y) y otros atributos
+            textElement.style.left = `${node.x}px`;
+            textElement.style.top = `${node.y}px`;
+            textElement.style.width = `${node.width}px`;
+            textElement.style.height = `${node.height}px`;
+            textElement.style.color = node.color || '#000';
+
+            // Añadir el texto al item
+            kinopioItem.appendChild(textElement);
+          }
+
+          // Añadir el item al contenedor
+          container.appendChild(kinopioItem);
+        });
+      })
+      .catch(error => {
+        console.error("Error al cargar el archivo .canvas:", error);
+        document.body.innerHTML = "No se pudo cargar el archivo .canvas.";
+      });
+  </script>
+
+</body>
+</html>
