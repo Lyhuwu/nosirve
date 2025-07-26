@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi Lienzo Kinopio</title>
   <style>
-    /* Fondo y márgenes generales */
+    /* Estilo básico para el cuerpo y el canvas */
     body {
       margin: 0;
       padding: 0;
@@ -13,7 +13,6 @@
       background: #f7f7f7;
     }
 
-    /* Canvas con borde suave y alineación central */
     #canvas {
       position: relative;
       width: 100%;
@@ -27,10 +26,9 @@
       margin: 0 auto;
     }
 
-    /* Estilo de los nodos de Kinopio */
+    /* Estilo para los nodos (cuadros de texto) */
     .node {
       position: absolute;
-      display: inline-block;
       padding: 15px 20px;
       font-size: 18px;
       background-color: #cfe7ff;
@@ -38,22 +36,21 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       font-family: 'Segoe UI', sans-serif;
       color: #333;
-      transition: transform 0.3s ease;
-      max-width: 280px;
-      min-width: 120px;
+      z-index: 10;
       white-space: pre-wrap;
       word-wrap: break-word;
-      z-index: 10;
     }
 
-    /* Estilo de imágenes y gifs con tamaño fijo */
+    /* Estilo para imágenes (sin márgenes, manteniendo el tamaño original) */
     .node img {
-      max-width: 300px; /* Tamaño fijo para las imágenes */
+      width: auto;
       height: auto;
+      max-width: 100%;
+      max-height: 100%;
       border-radius: 12px;
     }
 
-    /* Botones estilizados para Spotify y otros enlaces */
+    /* Estilo para los botones (enlace de Spotify y GitHub) */
     .button-link {
       display: inline-block;
       padding: 12px 18px;
@@ -83,30 +80,30 @@
   <div id="canvas"></div>
 
   <script>
-    // Fetch del archivo canvas (aquí debes poner tu link a GitHub)
-    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.canvas')
+    // Cargar el archivo JSON (canvas) desde GitHub
+    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.canvas') // URL de tu archivo canvas
       .then(res => res.json())
       .then(data => {
         const canvas = document.getElementById('canvas');
 
-        // Recorrer cada nodo para colocarlo en el lienzo
+        // Iterar sobre los nodos (elementos) del canvas
         data.nodes.forEach(node => {
           const div = document.createElement('div');
           div.className = 'node';
 
-          // Posicionar el nodo con las coordenadas 'x' y 'y' que nos da el JSON
+          // Ajustar la posición (x, y)
           div.style.left = node.x + 'px';
           div.style.top = node.y + 'px';
 
           const text = node.text.trim();
 
-          // Si es una URL de imagen, se muestra la imagen con tamaño fijo
+          // Si es una URL de imagen, mostrarla sin margen, con su tamaño original
           if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('cdn.kinopio')) {
             const img = document.createElement('img');
             img.src = text;
             div.appendChild(img);
           }
-          // Si es un enlace de Spotify, se muestra como un botón bonito
+          // Si es un enlace de Spotify, lo mostramos como un botón bonito
           else if (text.includes('open.spotify.com')) {
             const a = document.createElement('a');
             a.href = text;
@@ -115,7 +112,7 @@
             a.innerHTML = '🎵 Escuchar en Spotify';
             div.appendChild(a);
           }
-          // Si es un enlace de GitHub u otro, lo hace clickable
+          // Si es un enlace de GitHub, lo mostramos como un botón bonito
           else if (text.includes('github.io')) {
             const a = document.createElement('a');
             a.href = text;
@@ -124,18 +121,17 @@
             a.innerHTML = '🔗 Abrir enlace';
             div.appendChild(a);
           }
-          // Si es texto normal, lo mostramos
+          // Si es un texto normal, lo mostramos dentro de una tarjetita ajustable
           else {
-            // Añadir un emoji antes del texto (si queremos)
-            const emoji = document.createElement('span');
-            emoji.className = 'emoji';
-            emoji.innerText = '💬';  // Emoji decorativo
+            div.innerText = text;
 
-            div.prepend(emoji);
-            div.innerText += ' ' + text;  // Añadir texto
+            // Ajustar el tamaño de la tarjeta de texto según el tamaño del texto
+            div.style.fontSize = node.fontSize ? node.fontSize + 'px' : '18px';
+            div.style.width = node.width ? node.width + 'px' : 'auto';
+            div.style.height = node.height ? node.height + 'px' : 'auto';
           }
 
-          // Añadir el nodo al lienzo
+          // Añadir el nodo (div) al lienzo
           canvas.appendChild(div);
         });
       })
