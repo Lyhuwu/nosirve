@@ -1,1 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Para mi arrocito</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .kinopio-embed {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    iframe {
+      height: 100%;
+      width: 100%;
+      border: none;
+    }
+
+    .mensaje-amor {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background: linear-gradient(135deg, #ffe6f0, #fff);
+      color: #000;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-size: 2.3em;
+      padding: 30px 40px;
+      border: 4px solid #ff69b4;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+      z-index: 999;
+      animation: fadeOut 2s ease-out 5s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    .boton-musica {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 18px;
+      font-size: 1em;
+      background: #fff;
+      border: 2px solid #ff69b4;
+      color: #ff69b4;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #ff69b480;
+      z-index: 1000;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .boton-musica:hover {
+      background-color: #ffe6f0;
+      color: #d61b78;
+    }
+
+    .emoji {
+      position: fixed;
+      font-size: 2rem;
+      pointer-events: none;
+      animation: floatUp 10s linear forwards, fadeOut 10s forwards;
+      z-index: 998;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(100vh); opacity: 1; }
+      to   { transform: translateY(-20vh); opacity: 0; }
+    }
+
+    #mensajeCarga {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff0fa;
+      color: #d61b78;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-size: 1.6em;
+      padding: 20px 30px;
+      border: 3px solid #ff69b4;
+      border-radius: 18px;
+      box-shadow: 0 0 12px rgba(255, 105, 180, 0.4);
+      z-index: 1001;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mensaje-amor">
+    Para mi arrocito, mi amor, mi seyora, mi reina, mi todo
+  </div>
+
+  <div id="mensajeCarga">
+    Espera a que cargue para que puedas ver,<br>de lo contrario actualice mi bebe 💗
+  </div>
+
+  <div class="kinopio-embed">
+    <iframe src="https://kinopio.club/embed/?spaceId=8UGIFw8MmL2t1Dfgz-GUE&zoom=91"></iframe>
+  </div>
+
+  <audio id="musica" src="https://lyhuwu.github.io/Para-Anita-/audio/if-ain_t-got-you-Alicia-Keys-_Lyrics-Español_Inglés_-SlaterArt.mp3" loop></audio>
+
+  <button id="botonMusica" class="boton-musica">🎵 Reproducir música</button>
+
+  <script>
+    const musica = document.getElementById("musica");
+    const boton = document.getElementById("botonMusica");
+
+    boton.addEventListener("click", async () => {
+      try {
+        if (musica.paused) {
+          await musica.play();
+          boton.innerText = "🔇 Pausar música";
+
+          // Activar pantalla completa
+          const elem = document.documentElement;
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+          }
+
+        } else {
+          musica.pause();
+          boton.innerText = "🎵 Reproducir música";
+        }
+      } catch (error) {
+        alert("No se pudo reproducir la música: " + error.message);
+      }
+    });
+
+    // Corazones flotantes
+    const emojis = ['💜', '💙'];
+    for (let i = 0; i < 30; i++) {
+      const emoji = document.createElement('div');
+      emoji.classList.add('emoji');
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.left = Math.random() * 100 + 'vw';
+      emoji.style.top = Math.random() * 100 + 'vh';
+      emoji.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 10000);
+    }
+
+    // Ocultar mensaje de carga cuando se cargue el iframe
+    const iframe = document.querySelector('.kinopio-embed iframe');
+    const mensaje = document.getElementById('mensajeCarga');
+
+    iframe.addEventListener('load', () => {
+      mensaje.style.display = 'none';
+    });
+
+    // Evitar salir con un solo "atrás"
+    if (history.pushState) {
+      history.pushState(null, null, location.href);
+      window.onpopstate = function () {
+        history.go(1);
+      };
+    }
+  </script>
+
+</body>
+</html>
 
