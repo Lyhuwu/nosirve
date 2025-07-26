@@ -20,6 +20,12 @@
     .kinopio-item {
       position: absolute;
     }
+    .kinopio-text {
+      font-family: 'Arial', sans-serif;
+      color: #000;
+      font-size: 16px;
+      word-wrap: break-word;
+    }
   </style>
 </head>
 <body>
@@ -31,40 +37,35 @@
   </div>
 
   <script>
-    // URL del archivo JSON en GitHub
-    const jsonURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.json";
+    // URL del archivo .canvas en GitHub (reemplaza esta URL con tu enlace raw)
+    const canvasURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas";
 
-    // Función para cargar y procesar el JSON
-    fetch(jsonURL)
-      .then(response => response.json())
+    // Función para cargar y procesar el archivo .canvas
+    fetch(canvasURL)
+      .then(response => response.json()) // Obtener el JSON
       .then(data => {
-        // Procesar cada objeto del JSON y añadirlo al contenedor de Kinopio
+        // Procesar cada nodo del JSON y añadirlo al contenedor
         const container = document.getElementById("kinopioContainer");
 
-        // Iterar sobre los elementos del JSON y crear los correspondientes en HTML
-        data.objects.forEach(item => {
+        // Iterar sobre los nodos y crear los correspondientes en HTML
+        data.nodes.forEach(node => {
           const kinopioItem = document.createElement('div');
           kinopioItem.classList.add('kinopio-item');
 
-          // Aplicamos posición (si está disponible en el JSON)
-          kinopioItem.style.left = `${item.x}px`;
-          kinopioItem.style.top = `${item.y}px`;
-
-          // Si el objeto tiene una imagen o gif, lo agregamos
-          if (item.image) {
-            const img = document.createElement('img');
-            img.src = item.image;
-            img.style.width = item.width + 'px'; // Asumiendo que el JSON tiene un tamaño de imagen
-            img.style.height = item.height + 'px';
-            kinopioItem.appendChild(img);
-          }
-
-          // Si el objeto tiene texto, lo añadimos
-          if (item.text) {
+          // Si el nodo es de tipo texto, lo procesamos
+          if (node.type === "text") {
             const textElement = document.createElement('div');
-            textElement.textContent = item.text;
-            textElement.style.color = item.textColor || 'black';
-            textElement.style.fontSize = item.fontSize || '16px';
+            textElement.classList.add('kinopio-text');
+            textElement.textContent = node.text;
+
+            // Aplicamos estilo de posición (x, y) y otros atributos
+            textElement.style.left = `${node.x}px`;
+            textElement.style.top = `${node.y}px`;
+            textElement.style.width = `${node.width}px`;
+            textElement.style.height = `${node.height}px`;
+            textElement.style.color = node.color || '#000';
+
+            // Añadir el texto al item
             kinopioItem.appendChild(textElement);
           }
 
@@ -73,8 +74,8 @@
         });
       })
       .catch(error => {
-        console.error("Error al cargar el JSON:", error);
-        document.body.innerHTML = "No se pudo cargar el archivo JSON.";
+        console.error("Error al cargar el archivo .canvas:", error);
+        document.body.innerHTML = "No se pudo cargar el archivo .canvas.";
       });
   </script>
 
