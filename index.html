@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ver JSON</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f7f7f7;
+    }
+    #content {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    pre {
+      background-color: #282c34;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 1.1em;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Visualizar JSON desde GitHub</h1>
+  
+  <div id="content">
+    <p>El contenido del JSON se mostrará aquí:</p>
+    <pre id="jsonContent"></pre>
+  </div>
+
+  <script>
+    // URL del archivo JSON en GitHub
+    const jsonURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.json";
+
+    // Función para cargar el JSON desde la URL
+    fetch(jsonURL)
+      .then(response => response.json())
+      .then(data => {
+        // Muestra el JSON como texto formateado en el contenedor
+        document.getElementById("jsonContent").textContent = JSON.stringify(data, null, 2);
+      })
+      .catch(error => {
+        // Maneja errores si el archivo no se puede cargar
+        console.error("Error al cargar el JSON:", error);
+        document.getElementById("jsonContent").textContent = "Hubo un error al cargar el archivo JSON.";
+      });
+  </script>
+
+</body>
+</html>
 
