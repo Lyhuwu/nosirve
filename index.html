@@ -3,61 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ver JSON</title>
+  <title>Ver mi Kinopio</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
-      background-color: #f7f7f7;
+      padding: 0;
+      overflow: hidden;
+      background: #f7f7f7;
     }
-    #content {
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 20px;
-      margin-top: 20px;
-      max-width: 100%;
-      overflow-x: auto;
+    .kinopio-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: auto;
     }
-    pre {
-      background-color: #282c34;
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-      font-size: 1.1em;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+    .kinopio-item {
+      position: absolute;
     }
   </style>
 </head>
 <body>
 
-  <h1>Visualizar JSON desde GitHub</h1>
-  
-  <div id="content">
-    <p>El contenido del JSON se mostrará aquí:</p>
-    <pre id="jsonContent"></pre>
+  <h1 style="text-align: center; color: #ff69b4;">¡Bienvenido a mi espacio de Kinopio!</h1>
+
+  <div class="kinopio-container" id="kinopioContainer">
+    <!-- El contenido se añadirá aquí -->
   </div>
 
   <script>
     // URL del archivo JSON en GitHub
     const jsonURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.json";
 
-    // Función para cargar el JSON desde la URL
+    // Función para cargar y procesar el JSON
     fetch(jsonURL)
       .then(response => response.json())
       .then(data => {
-        // Muestra el JSON como texto formateado en el contenedor
-        document.getElementById("jsonContent").textContent = JSON.stringify(data, null, 2);
+        // Procesar cada objeto del JSON y añadirlo al contenedor de Kinopio
+        const container = document.getElementById("kinopioContainer");
+
+        // Iterar sobre los elementos del JSON y crear los correspondientes en HTML
+        data.objects.forEach(item => {
+          const kinopioItem = document.createElement('div');
+          kinopioItem.classList.add('kinopio-item');
+
+          // Aplicamos posición (si está disponible en el JSON)
+          kinopioItem.style.left = `${item.x}px`;
+          kinopioItem.style.top = `${item.y}px`;
+
+          // Si el objeto tiene una imagen o gif, lo agregamos
+          if (item.image) {
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.style.width = item.width + 'px'; // Asumiendo que el JSON tiene un tamaño de imagen
+            img.style.height = item.height + 'px';
+            kinopioItem.appendChild(img);
+          }
+
+          // Si el objeto tiene texto, lo añadimos
+          if (item.text) {
+            const textElement = document.createElement('div');
+            textElement.textContent = item.text;
+            textElement.style.color = item.textColor || 'black';
+            textElement.style.fontSize = item.fontSize || '16px';
+            kinopioItem.appendChild(textElement);
+          }
+
+          // Añadir el item al contenedor
+          container.appendChild(kinopioItem);
+        });
       })
       .catch(error => {
-        // Maneja errores si el archivo no se puede cargar
         console.error("Error al cargar el JSON:", error);
-        document.getElementById("jsonContent").textContent = "Hubo un error al cargar el archivo JSON.";
+        document.body.innerHTML = "No se pudo cargar el archivo JSON.";
       });
   </script>
 
 </body>
 </html>
-
