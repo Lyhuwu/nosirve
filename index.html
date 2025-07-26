@@ -2,33 +2,30 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Para mi arrocito</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
+      background: #000;
       height: 100%;
       overflow: hidden;
-      background: #000;
     }
 
     .kinopio-embed {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      height: 100%;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100vw;
+      height: 100dvh; /* ✅ Evita el borde negro en móviles */
+      overflow: hidden;
     }
 
     iframe {
+      width: 100%;
+      height: 100%;
       border: none;
-      transition: transform 0.3s ease;
-      transform-origin: center center;
-      max-width: none;
-      max-height: none;
     }
 
     .mensaje-amor {
@@ -55,8 +52,10 @@
       }
     }
 
-    .boton-musica, .zoom-control {
+    .boton-musica {
       position: fixed;
+      bottom: 20px;
+      right: 20px;
       padding: 12px 18px;
       font-size: 1em;
       background: #fff;
@@ -64,59 +63,14 @@
       color: #ff69b4;
       border-radius: 12px;
       box-shadow: 0 0 10px #ff69b480;
+      z-index: 1000;
       cursor: pointer;
       transition: all 0.3s ease;
-      z-index: 1000;
     }
 
-    .boton-musica:hover, .zoom-control:hover {
+    .boton-musica:hover {
       background-color: #ffe6f0;
       color: #d61b78;
-    }
-
-    .boton-musica {
-      bottom: 20px;
-      right: 20px;
-    }
-
-    .zoom-controls {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .emoji {
-      position: fixed;
-      font-size: 2rem;
-      pointer-events: none;
-      animation: floatUp 10s linear forwards, fadeOut 10s forwards;
-      z-index: 998;
-    }
-
-    @keyframes floatUp {
-      from { transform: translateY(100vh); opacity: 1; }
-      to   { transform: translateY(-20vh); opacity: 0; }
-    }
-
-    #mensajeCarga {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff0fa;
-      color: #d61b78;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      font-size: 1.6em;
-      padding: 20px 30px;
-      border: 3px solid #ff69b4;
-      border-radius: 18px;
-      box-shadow: 0 0 12px rgba(255, 105, 180, 0.4);
-      z-index: 1001;
-      text-align: center;
     }
   </style>
 </head>
@@ -126,91 +80,27 @@
     Para mi arrocito, mi amor, mi seyora, mi reina, mi todo
   </div>
 
-  <div id="mensajeCarga">
-    Espera a que cargue para que puedas ver,<br>de lo contrario actualice mi bebe 💗
-  </div>
-
   <div class="kinopio-embed">
-    <iframe id="kinopioFrame" src="https://kinopio.club/embed/?spaceId=8UGIFw8MmL2t1Dfgz-GUE&zoom=91"></iframe>
+    <iframe src="https://kinopio.club/embed/?spaceId=VpD_KKGvC0l9ILCYEJyvX&zoom=92"></iframe>
   </div>
 
   <audio id="musica" src="https://lyhuwu.github.io/Para-Anita-/audio/if-ain_t-got-you-Alicia-Keys-_Lyrics-Español_Inglés_-SlaterArt.mp3" loop></audio>
 
   <button id="botonMusica" class="boton-musica">🎵 Reproducir música</button>
 
-  <div class="zoom-controls">
-    <button class="zoom-control" id="zoomIn">🔍 +</button>
-    <button class="zoom-control" id="zoomOut">🔎 −</button>
-  </div>
-
   <script>
     const musica = document.getElementById("musica");
     const boton = document.getElementById("botonMusica");
-    const iframe = document.getElementById("kinopioFrame");
-    let zoomLevel = 1;
 
-    boton.addEventListener("click", async () => {
-      try {
-        if (musica.paused) {
-          await musica.play();
-          boton.innerText = "🔇 Pausar música";
-
-          // Activar pantalla completa
-          const elem = document.documentElement;
-          if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-          } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-          } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-          }
-
-        } else {
-          musica.pause();
-          boton.innerText = "🎵 Reproducir música";
-        }
-      } catch (error) {
-        alert("No se pudo reproducir la música: " + error.message);
+    boton.addEventListener("click", () => {
+      if (musica.paused) {
+        musica.play();
+        boton.innerText = "🔇 Pausar música";
+      } else {
+        musica.pause();
+        boton.innerText = "🎵 Reproducir música";
       }
     });
-
-    // Zoom manual visual (escala)
-    document.getElementById('zoomIn').addEventListener('click', () => {
-      zoomLevel = Math.min(2, zoomLevel + 0.1);
-      iframe.style.transform = `scale(${zoomLevel})`;
-    });
-
-    document.getElementById('zoomOut').addEventListener('click', () => {
-      zoomLevel = Math.max(0.5, zoomLevel - 0.1);
-      iframe.style.transform = `scale(${zoomLevel})`;
-    });
-
-    // Corazones flotantes
-    const emojis = ['💜', '💙'];
-    for (let i = 0; i < 30; i++) {
-      const emoji = document.createElement('div');
-      emoji.classList.add('emoji');
-      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      emoji.style.left = Math.random() * 100 + 'vw';
-      emoji.style.top = Math.random() * 100 + 'vh';
-      emoji.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
-      document.body.appendChild(emoji);
-      setTimeout(() => emoji.remove(), 10000);
-    }
-
-    // Ocultar mensaje de carga cuando se cargue el iframe
-    const mensaje = document.getElementById('mensajeCarga');
-    iframe.addEventListener('load', () => {
-      mensaje.style.display = 'none';
-    });
-
-    // Evitar salir con un solo "atrás"
-    if (history.pushState) {
-      history.pushState(null, null, location.href);
-      window.onpopstate = function () {
-        history.go(1);
-      };
-    }
   </script>
 
 </body>
