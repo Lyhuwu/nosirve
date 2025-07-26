@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi Lienzo Kinopio</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       background: #f7f7f7;
-      font-family: sans-serif;
     }
     #canvas {
       position: relative;
-      margin: 50px auto;
-      width: 100%;
-      max-width: 2000px;
-      height: auto;
-      background: white;
-      border: 2px dashed pink;
+      width: 3000px;
+      height: 2000px;
+      background: #fff;
+      margin: 0 auto;
+      overflow: visible;
+      border: 2px dashed #ff69b4;
     }
     .node {
       position: absolute;
@@ -28,20 +27,26 @@
       white-space: pre-wrap;
       overflow-wrap: break-word;
       font-family: sans-serif;
+      text-align: center;
     }
     .node img {
       max-width: 100%;
       max-height: 100%;
       border-radius: 8px;
     }
-    .node iframe {
-      width: 100%;
+    .button {
+      background-color: #1db954;
+      color: white;
+      border-radius: 8px;
+      padding: 10px 20px;
       border: none;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      font-weight: bold;
     }
-    .node a {
-      display: block;
-      width: 100%;
-      height: 100%;
+    .button:hover {
+      background-color: #1ed760;
     }
   </style>
 </head>
@@ -49,59 +54,85 @@
   <div id="canvas"></div>
 
   <script>
-    // URL del archivo JSON en GitHub
-    const jsonURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.json";
+    // Cargar los archivos .json y .canvas
+    const jsonURL = 'https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.json';
+    const canvasURL = 'https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas';
 
-    // Función para cargar y procesar el JSON
-    fetch(jsonURL)
-      .then(response => response.json())
-      .then(data => {
-        const canvas = document.getElementById('canvas');
-        
-        // Recorrer los elementos del JSON
-        data.nodes.forEach(node => {
-          const div = document.createElement('div');
-          div.className = 'node';
-          div.style.left = node.x + 'px';
-          div.style.top = node.y + 'px';
-          div.style.width = node.width + 'px';
-          div.style.height = node.height + 'px';
-          div.style.backgroundColor = node.color || '#f0f0f0';
-          div.style.border = '1px solid #ccc';
+    Promise.all([fetch(jsonURL), fetch(canvasURL)])
+      .then(([jsonRes, canvasRes]) => Promise.all([jsonRes.json(), canvasRes.json()]))
+      .then(([jsonData, canvasData]) => {
+        const canvasElement = document.getElementById('canvas');
+
+        // Procesar los nodos del JSON
+        jsonData.nodes.forEach(node => {
+          const nodeDiv = document.createElement('div');
+          nodeDiv.classList.add('node');
+          nodeDiv.style.left = node.x + 'px';
+          nodeDiv.style.top = node.y + 'px';
+          nodeDiv.style.width = node.width + 'px';
+          nodeDiv.style.height = node.height + 'px';
+          nodeDiv.style.backgroundColor = node.color || '#f0f0f0';
+          nodeDiv.style.fontSize = node.fontSize || '16px';
 
           const text = node.text.trim();
 
-          // Mostrar imágenes si es un enlace de imagen
+          // Si el nodo tiene un enlace de imagen
           if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('media') || text.includes('cdn.kinopio')) {
             const img = document.createElement('img');
             img.src = text;
-            div.appendChild(img);
+            nodeDiv.appendChild(img);
           }
-          // Mostrar enlaces de Spotify como iframe
+          // Si el nodo es un enlace de Spotify, lo insertamos como un botón
           else if (text.includes('open.spotify.com')) {
-            const iframe = document.createElement('iframe');
-            iframe.src = text.replace('/track/', '/embed/track/');
-            iframe.width = '100%';
-            iframe.height = '80';
-            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            iframe.loading = 'lazy';
-            iframe.frameBorder = '0';
-            div.appendChild(iframe);
+            const button = document.createElement('a');
+            button.href = text;
+            button.target = "_blank";
+            button.classList.add('button');
+            button.textContent = 'Escuchar en Spotify';
+            nodeDiv.appendChild(button);
           }
-          // Mostrar texto normal o emoji
+          // Si es un enlace a otra página (como GitHub), lo insertamos como un botón
+          else if (text.includes('github.com')) {
+            const button = document.createElement('a');
+            button.href = text;
+            button.target = "_blank";
+            button.classList.add('button');
+            button.textContent = 'Ver en GitHub';
+            nodeDiv.appendChild(button);
+          }
+          // Si el nodo es solo texto
           else {
-            div.innerText = text;
+            nodeDiv.innerText = text;
           }
 
-          // Añadir el nodo al canvas
-          canvas.appendChild(div);
+          canvasElement.appendChild(nodeDiv);
+        });
+
+        // Procesar las conexiones del canvas (si las hay)
+        canvasData.edges.forEach(edge => {
+          const fromNode = document.getElementById(edge.fromNode);
+          const toNode = document.getElementById(edge.toNode);
+          
+          if (fromNode && toNode) {
+            const line = document.createElement('div');
+            line.style.position = 'absolute';
+            line.style.width = '2px';
+            line.style.backgroundColor = '#ff69b4';
+            // Crear la línea (flecha) entre los nodos
+            const fromRect = fromNode.getBoundingClientRect();
+            const toRect = toNode.getBoundingClientRect();
+
+            line.style.left = fromRect.left + (fromRect.width / 2) + 'px';
+            line.style.top = fromRect.top + (fromRect.height / 2) + 'px';
+            line.style.height = Math.abs(fromRect.top - toRect.top) + 'px';
+
+            canvasElement.appendChild(line);
+          }
         });
       })
       .catch(error => {
-        console.error("Error al cargar el archivo JSON:", error);
-        document.body.innerHTML = "No se pudo cargar el archivo JSON.";
+        console.error('Error al cargar los archivos:', error);
       });
   </script>
-
 </body>
 </html>
