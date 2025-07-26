@@ -1,35 +1,52 @@
-// Cargar el archivo JSON
-fetch('Ayayayayaay.json')
-  .then(response => response.json())
-  .then(data => {
-    const cards = data.cards;
-    if (!cards || cards.length === 0) {
-      console.error("No se encontraron nodos en el JSON");
-      return;
+async function cargarDatos() {
+  const canvasRes = await fetch('Ayayayayaay.canvas');
+  const canvasData = await canvasRes.json();
+  console.log("Datos Canvas cargados:", canvasData);
+
+  const contenedor = document.getElementById('canvas');
+
+  canvasData.nodes.forEach(node => {
+    const div = document.createElement('div');
+    div.className = 'node';
+    div.style.left = `${node.x}px`;
+    div.style.top = `${node.y}px`;
+
+    if (node.text) {
+      // Si es imagen o GIF
+      if (/\.(jpg|jpeg|png|gif|webp)$/i.test(node.text)) {
+        const img = document.createElement('img');
+        img.src = node.text;
+        div.appendChild(img);
+      }
+      // Si es un link de Spotify
+      else if (node.text.includes('open.spotify.com')) {
+        const iframe = document.createElement('iframe');
+        iframe.src = node.text.replace('open.spotify.com', 'open.spotify.com/embed');
+        iframe.width = "300";
+        iframe.height = "80";
+        iframe.frameBorder = "0";
+        iframe.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+        iframe.loading = "lazy";
+        div.appendChild(iframe);
+      }
+      // Si es un link normal
+      else if (node.text.startsWith('http')) {
+        const a = document.createElement('a');
+        a.href = node.text;
+        a.textContent = node.text;
+        a.target = "_blank";
+        div.appendChild(a);
+      }
+      // Si es texto
+      else {
+        div.textContent = node.text;
+      }
     }
 
-    const container = document.getElementById('canvas');
-
-    cards.forEach(card => {
-      const el = document.createElement('div');
-      el.className = 'node';
-      el.innerHTML = card.name;
-      el.style.position = 'absolute';
-      el.style.left = card.x + 'px';
-      el.style.top = card.y + 'px';
-      el.style.width = (card.width || 200) + 'px';
-      el.style.height = (card.height || 100) + 'px';
-      el.style.background = card.backgroundColor || '#f9f9f9';
-      el.style.border = '2px solid pink';
-      el.style.padding = '10px';
-      el.style.borderRadius = '12px';
-      el.style.color = 'white';
-      el.style.overflow = 'hidden';
-
-      container.appendChild(el);
-    });
-  })
-  .catch(error => {
-    console.error("Error cargando el JSON:", error);
+    contenedor.appendChild(div);
   });
+}
 
+cargarDatos().catch(error => {
+  console.error("Error al cargar los archivos:", error);
+});
