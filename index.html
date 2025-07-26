@@ -47,37 +47,45 @@
       .then(response => response.json())
       .then(data => {
         console.log('Datos JSON cargados:', data);
-        const canvas = document.getElementById('canvas');
-        // Accede a la propiedad nodes (en lugar de objects)
-        data.nodes.forEach(node => {
-          const div = document.createElement('div');
-          div.className = 'node';
-          div.style.left = node.x + 'px';
-          div.style.top = node.y + 'px';
-          div.style.width = node.width + 'px';
-          div.style.height = node.height + 'px';
-          div.style.backgroundColor = node.color || '#f0f0f0';
 
-          // Si el texto contiene un enlace de imagen
-          if (node.text && node.text.match(/\.(jpg|jpeg|png|gif)$/i)) {
-            const img = document.createElement('img');
-            img.src = node.text;
-            div.appendChild(img);
-          } else if (node.text && node.text.includes('open.spotify.com')) {
-            const iframe = document.createElement('iframe');
-            iframe.src = node.text.replace('/track/', '/embed/track/');
-            iframe.width = '100%';
-            iframe.height = '80';
-            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            iframe.loading = 'lazy';
-            iframe.frameBorder = '0';
-            div.appendChild(iframe);
-          } else if (node.text) {
-            div.innerText = node.text;
-          }
+        // Asegurarnos de que los nodos existen en la respuesta
+        // Revisamos la estructura para acceder correctamente a los nodos
+        const nodes = data.nodes || []; // O data['nodes'] dependiendo de cómo esté estructurado el JSON
 
-          canvas.appendChild(div);
-        });
+        if (nodes.length > 0) {
+          const canvas = document.getElementById('canvas');
+          nodes.forEach(node => {
+            const div = document.createElement('div');
+            div.className = 'node';
+            div.style.left = node.x + 'px';
+            div.style.top = node.y + 'px';
+            div.style.width = node.width + 'px';
+            div.style.height = node.height + 'px';
+            div.style.backgroundColor = node.color || '#f0f0f0';
+
+            // Si el texto contiene un enlace de imagen
+            if (node.text && node.text.match(/\.(jpg|jpeg|png|gif)$/i)) {
+              const img = document.createElement('img');
+              img.src = node.text;
+              div.appendChild(img);
+            } else if (node.text && node.text.includes('open.spotify.com')) {
+              const iframe = document.createElement('iframe');
+              iframe.src = node.text.replace('/track/', '/embed/track/');
+              iframe.width = '100%';
+              iframe.height = '80';
+              iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+              iframe.loading = 'lazy';
+              iframe.frameBorder = '0';
+              div.appendChild(iframe);
+            } else if (node.text) {
+              div.innerText = node.text;
+            }
+
+            canvas.appendChild(div);
+          });
+        } else {
+          console.error('No se encontraron nodos en el JSON.');
+        }
       })
       .catch(error => {
         console.error('Error al cargar el JSON:', error);
