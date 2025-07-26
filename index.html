@@ -71,8 +71,10 @@
     fetch(canvasURL)
       .then(response => response.json()) // Obtener el JSON
       .then(data => {
-        // Procesar cada nodo del JSON y añadirlo al contenedor
         const container = document.getElementById("kinopioContainer");
+
+        // Calcular el factor de escala
+        const scaleFactor = 1; // Ajusta este valor si es necesario para cambiar el tamaño general
 
         // Iterar sobre los nodos y crear los correspondientes en HTML
         data.nodes.forEach(node => {
@@ -82,7 +84,8 @@
           // Si el nodo es de tipo texto, lo procesamos
           if (node.type === "text") {
             const textElement = document.createElement('div');
-            // Ajustamos el tipo de texto según el formato (markdown)
+
+            // Ajustar el texto
             if (node.text.startsWith("##")) {
               textElement.classList.add('kinopio-subheader');
               textElement.textContent = node.text.slice(2).trim(); // Eliminar "##" del inicio
@@ -94,22 +97,23 @@
               textElement.textContent = node.text;
             }
 
-            // Si es un enlace de Spotify, lo convertimos en un enlace clickeable
-            if (node.text.includes("spotify.com")) {
+            // Detectar si el texto contiene un enlace de Spotify o URL
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            if (urlRegex.test(node.text)) {
               const link = document.createElement('a');
-              link.href = node.text;
-              link.target = "_blank";
+              link.href = node.text.match(urlRegex)[0]; // Extraer la primera URL
+              link.target = "_blank"; // Abrir en nueva ventana
               link.classList.add('kinopio-link');
-              link.textContent = "Escucha en Spotify";
-              textElement.innerHTML = ''; // Limpiar el contenido de texto
+              link.textContent = "Ir al enlace"; // Puedes personalizar el texto
+              textElement.textContent = ''; // Limpiar texto anterior y agregar el enlace
               textElement.appendChild(link);
             }
 
-            // Aplicamos las posiciones y otros estilos del nodo
-            textElement.style.left = `${node.x}px`;
-            textElement.style.top = `${node.y}px`;
-            textElement.style.width = `${node.width}px`;
-            textElement.style.height = `${node.height}px`;
+            // Ajustar la posición y tamaño
+            textElement.style.left = `${node.x * scaleFactor}px`;
+            textElement.style.top = `${node.y * scaleFactor}px`;
+            textElement.style.width = `${node.width * scaleFactor}px`;
+            textElement.style.height = `${node.height * scaleFactor}px`;
             textElement.style.color = node.color || '#000';
 
             // Añadir el texto al item
@@ -122,11 +126,11 @@
             imgElement.src = node.text;  // Usamos el texto como URL de la imagen
             imgElement.classList.add('kinopio-image');
 
-            // Ajustamos las dimensiones y la posición de la imagen
-            imgElement.style.left = `${node.x}px`;
-            imgElement.style.top = `${node.y}px`;
-            imgElement.style.width = `${node.width}px`;
-            imgElement.style.height = `${node.height}px`;
+            // Ajustar las posiciones y dimensiones de la imagen
+            imgElement.style.left = `${node.x * scaleFactor}px`;
+            imgElement.style.top = `${node.y * scaleFactor}px`;
+            imgElement.style.width = `${node.width * scaleFactor}px`;
+            imgElement.style.height = `${node.height * scaleFactor}px`;
 
             // Añadir la imagen al item
             kinopioItem.appendChild(imgElement);
