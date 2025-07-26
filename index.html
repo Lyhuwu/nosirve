@@ -46,8 +46,9 @@
       z-index: 10;
     }
 
+    /* Estilo de imágenes y gifs con tamaño fijo */
     .node img {
-      max-width: 100%;
+      max-width: 300px; /* Tamaño fijo para las imágenes */
       height: auto;
       border-radius: 12px;
     }
@@ -99,7 +100,7 @@
 
           const text = node.text.trim();
 
-          // Si es una URL de imagen, se muestra la imagen
+          // Si es una URL de imagen, se muestra la imagen con tamaño fijo
           if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('cdn.kinopio')) {
             const img = document.createElement('img');
             img.src = text;
