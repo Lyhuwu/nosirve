@@ -1,56 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi Lienzo Kinopio</title>
   <style>
+    /* Fondo y márgenes generales */
     body {
       margin: 0;
-      background: #f9f9f9;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: #f7f7f7;
     }
 
+    /* Canvas con borde suave y alineación central */
     #canvas {
       position: relative;
-      width: 3000px;
-      height: 2000px;
-      background: white;
-      margin: 50px auto;
-      border: 2px dashed pink;
-      overflow: visible;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background-color: white;
+      padding: 40px;
+      box-sizing: border-box;
+      border-radius: 12px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
     }
 
+    /* Estilo de los nodos de Kinopio */
     .node {
       position: absolute;
-      box-sizing: border-box;
+      display: inline-block;
+      padding: 15px 20px;
+      font-size: 18px;
+      background-color: #cfe7ff;
       border-radius: 16px;
-      padding: 12px;
-      background-color: #d6ecff; /* azulito suave */
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* sombra tenue */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       font-family: 'Segoe UI', sans-serif;
-      font-size: 15px;
       color: #333;
-      max-width: 320px;
+      transition: transform 0.3s ease;
+      max-width: 280px;
+      min-width: 120px;
       white-space: pre-wrap;
-      overflow-wrap: break-word;
+      word-wrap: break-word;
+      z-index: 10;
     }
 
     .node img {
-      display: block;
-      border-radius: 12px;
       max-width: 100%;
       height: auto;
-      margin: 0;
+      border-radius: 12px;
     }
 
+    /* Botones estilizados para Spotify y otros enlaces */
     .button-link {
       display: inline-block;
-      padding: 10px 16px;
+      padding: 12px 18px;
       background-color: #1db954;
       color: white;
       text-decoration: none;
       border-radius: 30px;
       font-weight: bold;
-      margin-top: 8px;
+      margin-top: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       transition: background-color 0.2s ease;
     }
@@ -58,50 +69,79 @@
     .button-link:hover {
       background-color: #17a44d;
     }
+
+    /* Decoraciones visuales */
+    .node .emoji {
+      font-size: 30px;
+      margin-right: 8px;
+    }
+
   </style>
 </head>
 <body>
   <div id="canvas"></div>
 
   <script>
-    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas')
+    // Fetch del archivo canvas (aquí debes poner tu link a GitHub)
+    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.canvas')
       .then(res => res.json())
       .then(data => {
         const canvas = document.getElementById('canvas');
 
+        // Recorrer cada nodo para colocarlo en el lienzo
         data.nodes.forEach(node => {
           const div = document.createElement('div');
           div.className = 'node';
+
+          // Posicionar el nodo con las coordenadas 'x' y 'y' que nos da el JSON
           div.style.left = node.x + 'px';
           div.style.top = node.y + 'px';
 
           const text = node.text.trim();
 
-          // Mostrar imagen si es una URL válida
+          // Si es una URL de imagen, se muestra la imagen
           if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('cdn.kinopio')) {
             const img = document.createElement('img');
             img.src = text;
             div.appendChild(img);
           }
-
-          // Link a Spotify o GitHub u otro
-          else if (text.includes('open.spotify.com') || text.includes('github.io')) {
+          // Si es un enlace de Spotify, se muestra como un botón bonito
+          else if (text.includes('open.spotify.com')) {
             const a = document.createElement('a');
             a.href = text;
             a.target = '_blank';
             a.className = 'button-link';
-            a.innerText = text.includes('spotify') ? '🎵 Escuchar en Spotify' : '🔗 Abrir enlace';
+            a.innerHTML = '🎵 Escuchar en Spotify';
             div.appendChild(a);
           }
-
-          // Texto normal
+          // Si es un enlace de GitHub u otro, lo hace clickable
+          else if (text.includes('github.io')) {
+            const a = document.createElement('a');
+            a.href = text;
+            a.target = '_blank';
+            a.className = 'button-link';
+            a.innerHTML = '🔗 Abrir enlace';
+            div.appendChild(a);
+          }
+          // Si es texto normal, lo mostramos
           else {
-            div.innerText = text;
+            // Añadir un emoji antes del texto (si queremos)
+            const emoji = document.createElement('span');
+            emoji.className = 'emoji';
+            emoji.innerText = '💬';  // Emoji decorativo
+
+            div.prepend(emoji);
+            div.innerText += ' ' + text;  // Añadir texto
           }
 
+          // Añadir el nodo al lienzo
           canvas.appendChild(div);
         });
+      })
+      .catch(error => {
+        console.error("Error al cargar el archivo JSON:", error);
       });
   </script>
+
 </body>
 </html>
