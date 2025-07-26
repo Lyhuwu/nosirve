@@ -1,43 +1,112 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Feliz aniversario</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Lienzo Kinopio</title>
   <style>
     body {
+      font-family: sans-serif;
       margin: 0;
       padding: 0;
-      background: #fff0f6;
-      font-family: 'Comic Sans MS', cursive;
+      background: #f9f9f9;
     }
-
-    .node-card {
+    #canvas {
+      position: relative;
+      width: 100%;
+      background-color: #fff;
+      margin: 50px auto;
+      border: 2px dashed pink;
+      overflow: visible;
+    }
+    .node {
       position: absolute;
-      background: white;
-      border: 2px solid pink;
-      border-radius: 16px;
-      padding: 12px;
-      box-shadow: 0 0 8px rgba(255, 105, 180, 0.4);
-      max-width: 300px;
-      max-height: 300px;
-      overflow: auto;
+      box-sizing: border-box;
+      border-radius: 12px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.1);
+      font-family: sans-serif;
     }
-
-    .node-content img {
+    .node img {
       max-width: 100%;
       max-height: 100%;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #ffb6c1;
+      border-radius: 8px;
     }
-
-    .node-content p {
-      margin: 0;
-      color: #333;
+    .node iframe {
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
-  <script src="script.js"></script>
+  <div id="canvas"></div>
+  
+  <script>
+    // Cargar JSON de GitHub
+    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.json')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Datos JSON cargados:', data);
+
+        // Verificar si los nodos existen
+        if (data.cards && data.cards.length > 0) {
+          const canvas = document.getElementById('canvas');
+          
+          data.cards.forEach(node => {
+            const div = document.createElement('div');
+            div.className = 'node';
+            div.style.left = node.x + 'px';
+            div.style.top = node.y + 'px';
+            div.style.width = node.width + 'px';
+            div.style.height = node.height + 'px';
+            div.style.backgroundColor = node.color || '#f0f0f0';
+
+            const text = node.text.trim();
+            
+            // Comprobar si el texto es un enlace de imagen/gif
+            if (text.match(/\.(gif|jpe?g|png|webp)$/i)) {
+              const img = document.createElement("img");
+              img.src = text;
+              img.alt = "Imagen";
+              img.width = node.width;  // Usar el width del JSON para mantener el tamaño original
+              img.height = node.height; // Usar el height del JSON para mantener el tamaño original
+              div.appendChild(img);
+            }
+            // Si el texto es un enlace de Spotify
+            else if (text.includes('open.spotify.com')) {
+              const iframe = document.createElement('iframe');
+              iframe.src = text.replace('/track/', '/embed/track/');
+              iframe.width = '100%';
+              iframe.height = '80';
+              iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+              iframe.loading = 'lazy';
+              iframe.frameBorder = '0';
+              div.appendChild(iframe);
+            }
+            // Mostrar texto normal
+            else {
+              div.innerText = text;
+            }
+
+            canvas.appendChild(div);
+          });
+        } else {
+          console.error('No se encontraron nodos en el JSON.');
+        }
+      })
+      .catch(error => {
+        console.error('Error al cargar el JSON:', error);
+      });
+
+    // Cargar Canvas de GitHub
+    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Datos Canvas cargados:', data);
+        // Aquí puedes agregar código adicional si quieres personalizar aún más la visualización
+      })
+      .catch(error => {
+        console.error('Error al cargar el Canvas:', error);
+      });
+  </script>
 </body>
 </html>
