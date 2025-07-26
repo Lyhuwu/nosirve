@@ -31,6 +31,8 @@
     .kinopio-image {
       position: absolute;
       display: block;
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -78,10 +80,10 @@
             kinopioItem.appendChild(textElement);
           }
 
-          // Si el nodo es de tipo imagen, lo procesamos
-          if (node.type === "image" && node.image) {
+          // Si el nodo es de tipo imagen o gif, lo procesamos
+          if (node.type === "text" && node.text && (node.text.includes("http") || node.text.includes("https"))) {
             const imgElement = document.createElement('img');
-            imgElement.src = node.image;  // Usamos la URL de la imagen desde el JSON
+            imgElement.src = node.text;  // Usamos el texto como URL de la imagen
             imgElement.classList.add('kinopio-image');
 
             // Ajustamos las dimensiones y la posición de la imagen
