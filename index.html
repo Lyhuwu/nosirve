@@ -1,150 +1,84 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ver mi Kinopio</title>
+  <title>Mi Lienzo Kinopio</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #f7f7f7;
+      background: #f9f9f9;
     }
-    .kinopio-container {
+    #canvas {
       position: relative;
-      width: 100%;
-      height: 100vh;
-      overflow: auto;
-      background: #fff; /* Fondo blanco para ver los elementos */
+      width: 3000px;
+      height: 2000px;
+      background: white;
+      margin: 50px auto;
+      border: 2px dashed pink;
+      overflow: visible;
     }
-    .kinopio-item {
+    .node {
       position: absolute;
+      box-sizing: border-box;
+      border-radius: 12px;
+      padding: 8px;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      font-family: sans-serif;
     }
-    .kinopio-text {
-      font-family: 'Arial', sans-serif;
-      color: #000;
-      font-size: 16px;
-      word-wrap: break-word;
-      text-align: center;
-    }
-    .kinopio-header {
-      font-family: 'Arial', sans-serif;
-      font-weight: bold;
-      font-size: 24px;
-      color: #2c3e50;
-      text-align: center;
-    }
-    .kinopio-subheader {
-      font-family: 'Arial', sans-serif;
-      font-weight: bold;
-      font-size: 18px;
-      color: #34495e;
-      text-align: center;
-    }
-    .kinopio-image {
-      position: absolute;
-      display: block;
+    .node img {
       max-width: 100%;
-      height: auto;
-    }
-    .kinopio-link {
-      color: #1DB954; /* Color de Spotify */
-      text-decoration: none;
-      font-weight: bold;
+      max-height: 100%;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-
-  <h1 style="text-align: center; color: #ff69b4;">¡Bienvenido a mi espacio de Kinopio!</h1>
-
-  <div class="kinopio-container" id="kinopioContainer">
-    <!-- El contenido se añadirá aquí -->
-  </div>
+  <div id="canvas"></div>
 
   <script>
-    // URL del archivo .canvas en GitHub (reemplaza esta URL con tu enlace raw)
-    const canvasURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.canvas";
-
-    // Función para cargar y procesar el archivo .canvas
-    fetch(canvasURL)
-      .then(response => response.json()) // Obtener el JSON
+    // Carga desde GitHub
+    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas')
+      .then(res => res.json())
       .then(data => {
-        const container = document.getElementById("kinopioContainer");
-
-        // Calcular el factor de escala
-        const scaleFactor = 1; // Ajusta este valor si es necesario para cambiar el tamaño general
-
-        // Iterar sobre los nodos y crear los correspondientes en HTML
+        const canvas = document.getElementById('canvas');
         data.nodes.forEach(node => {
-          const kinopioItem = document.createElement('div');
-          kinopioItem.classList.add('kinopio-item');
+          const div = document.createElement('div');
+          div.className = 'node';
+          div.style.left = node.x + 'px';
+          div.style.top = node.y + 'px';
+          div.style.width = node.width + 'px';
+          div.style.height = node.height + 'px';
+          div.style.backgroundColor = node.color || '#f0f0f0';
+          div.style.border = '1px solid #ccc';
 
-          // Si el nodo es de tipo texto, lo procesamos
-          if (node.type === "text") {
-            const textElement = document.createElement('div');
+          const text = node.text.trim();
 
-            // Ajustar el texto
-            if (node.text.startsWith("##")) {
-              textElement.classList.add('kinopio-subheader');
-              textElement.textContent = node.text.slice(2).trim(); // Eliminar "##" del inicio
-            } else if (node.text.startsWith("#")) {
-              textElement.classList.add('kinopio-header');
-              textElement.textContent = node.text.slice(1).trim(); // Eliminar "#" del inicio
-            } else {
-              textElement.classList.add('kinopio-text');
-              textElement.textContent = node.text;
-            }
-
-            // Detectar si el texto contiene un enlace de Spotify o URL
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            if (urlRegex.test(node.text)) {
-              const link = document.createElement('a');
-              link.href = node.text.match(urlRegex)[0]; // Extraer la primera URL
-              link.target = "_blank"; // Abrir en nueva ventana
-              link.classList.add('kinopio-link');
-              link.textContent = "Ir al enlace"; // Puedes personalizar el texto
-              textElement.textContent = ''; // Limpiar texto anterior y agregar el enlace
-              textElement.appendChild(link);
-            }
-
-            // Ajustar la posición y tamaño
-            textElement.style.left = `${node.x * scaleFactor}px`;
-            textElement.style.top = `${node.y * scaleFactor}px`;
-            textElement.style.width = `${node.width * scaleFactor}px`;
-            textElement.style.height = `${node.height * scaleFactor}px`;
-            textElement.style.color = node.color || '#000';
-
-            // Añadir el texto al item
-            kinopioItem.appendChild(textElement);
+          // Mostrar imagen si es link de imagen
+          if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('media') || text.includes('cdn.kinopio')) {
+            const img = document.createElement('img');
+            img.src = text;
+            div.appendChild(img);
+          }
+          // Spotify link
+          else if (text.includes('open.spotify.com')) {
+            const iframe = document.createElement('iframe');
+            iframe.src = text.replace('/track/', '/embed/track/');
+            iframe.width = '100%';
+            iframe.height = '80';
+            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+            iframe.loading = 'lazy';
+            iframe.frameBorder = '0';
+            div.appendChild(iframe);
+          }
+          // Texto normal o emoji
+          else {
+            div.innerText = text;
           }
 
-          // Si el nodo contiene una URL de imagen o gif
-          if (node.text && (node.text.includes("http") || node.text.includes("https"))) {
-            const imgElement = document.createElement('img');
-            imgElement.src = node.text;  // Usamos el texto como URL de la imagen
-            imgElement.classList.add('kinopio-image');
-
-            // Ajustar las posiciones y dimensiones de la imagen
-            imgElement.style.left = `${node.x * scaleFactor}px`;
-            imgElement.style.top = `${node.y * scaleFactor}px`;
-            imgElement.style.width = `${node.width * scaleFactor}px`;
-            imgElement.style.height = `${node.height * scaleFactor}px`;
-
-            // Añadir la imagen al item
-            kinopioItem.appendChild(imgElement);
-          }
-
-          // Añadir el item al contenedor
-          container.appendChild(kinopioItem);
+          canvas.appendChild(div);
         });
-      })
-      .catch(error => {
-        console.error("Error al cargar el archivo .canvas:", error);
-        document.body.innerHTML = "No se pudo cargar el archivo .canvas.";
       });
   </script>
-
 </body>
 </html>
