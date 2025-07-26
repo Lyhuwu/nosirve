@@ -6,30 +6,64 @@
   <style>
     body {
       margin: 0;
-      background: #f9f9f9;
+      background: #fef0f8;
+      font-family: sans-serif;
     }
+
     #canvas {
       position: relative;
       width: 3000px;
       height: 2000px;
-      background: white;
       margin: 50px auto;
       border: 2px dashed pink;
-      overflow: visible;
+      background: white;
     }
+
     .node {
       position: absolute;
       box-sizing: border-box;
-      border-radius: 12px;
-      padding: 8px;
+      border-radius: 16px;
+      padding: 10px;
       white-space: pre-wrap;
       overflow-wrap: break-word;
-      font-family: sans-serif;
+      border: 2px solid #ffb6c1;
+      background: #fff0f5;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
     }
+
     .node img {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 8px;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 0;
+    }
+
+    .image-node {
+      padding: 0;
+      border: none;
+      background: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .link-button {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 10px 15px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+      transition: background 0.2s ease;
+    }
+
+    .link-button:hover {
+      background-color: #ff85c1;
     }
   </style>
 </head>
@@ -37,43 +71,44 @@
   <div id="canvas"></div>
 
   <script>
-    // Carga desde GitHub
     fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas')
       .then(res => res.json())
       .then(data => {
         const canvas = document.getElementById('canvas');
         data.nodes.forEach(node => {
+          const text = node.text.trim();
           const div = document.createElement('div');
+          const isImage = text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('media') || text.includes('cdn.kinopio');
+
           div.className = 'node';
+          if (isImage) div.classList.add('image-node');
+
           div.style.left = node.x + 'px';
           div.style.top = node.y + 'px';
           div.style.width = node.width + 'px';
           div.style.height = node.height + 'px';
-          div.style.backgroundColor = node.color || '#f0f0f0';
-          div.style.border = '1px solid #ccc';
+          if (!isImage) div.style.backgroundColor = node.color || '#fff0f5';
 
-          const text = node.text.trim();
-
-          // Mostrar imagen si es link de imagen
-          if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('media') || text.includes('cdn.kinopio')) {
+          if (isImage) {
             const img = document.createElement('img');
             img.src = text;
             div.appendChild(img);
-          }
-          // Spotify link
-          else if (text.includes('open.spotify.com')) {
-            const iframe = document.createElement('iframe');
-            iframe.src = text.replace('/track/', '/embed/track/');
-            iframe.width = '100%';
-            iframe.height = '80';
-            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            iframe.loading = 'lazy';
-            iframe.frameBorder = '0';
-            div.appendChild(iframe);
-          }
-          // Texto normal o emoji
-          else {
-            div.innerText = text;
+          } else if (text.includes('open.spotify.com')) {
+            const link = document.createElement('a');
+            link.href = text;
+            link.target = '_blank';
+            link.className = 'link-button';
+            link.textContent = '🎵 Escuchar en Spotify';
+            div.appendChild(link);
+          } else if (text.startsWith('http')) {
+            const link = document.createElement('a');
+            link.href = text;
+            link.target = '_blank';
+            link.className = 'link-button';
+            link.textContent = '🌐 Ver página';
+            div.appendChild(link);
+          } else {
+            div.textContent = text;
           }
 
           canvas.appendChild(div);
