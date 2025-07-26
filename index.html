@@ -7,17 +7,15 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: #f7f7f7;
+      background: #f9f9f9;
     }
     #canvas {
       position: relative;
-      width: 3000px;
-      height: 2000px;
-      background: #fff;
-      margin: 0 auto;
+      width: 100%;
+      height: 100vh;
+      background: white;
       overflow: visible;
-      border: 2px dashed #ff69b4;
+      border: 2px dashed pink;
     }
     .node {
       position: absolute;
@@ -27,26 +25,12 @@
       white-space: pre-wrap;
       overflow-wrap: break-word;
       font-family: sans-serif;
-      text-align: center;
+      font-size: 16px;
     }
     .node img {
       max-width: 100%;
       max-height: 100%;
       border-radius: 8px;
-    }
-    .button {
-      background-color: #1db954;
-      color: white;
-      border-radius: 8px;
-      padding: 10px 20px;
-      border: none;
-      text-decoration: none;
-      display: inline-block;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .button:hover {
-      background-color: #1ed760;
     }
   </style>
 </head>
@@ -54,92 +38,62 @@
   <div id="canvas"></div>
 
   <script>
-    // Cargar los archivos .json y .canvas
+    // Cargar el archivo JSON
     const jsonURL = 'https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.json';
     const canvasURL = 'https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas';
 
-    Promise.all([fetch(jsonURL), fetch(canvasURL)])
-      .then(([jsonRes, canvasRes]) => {
-        if (!jsonRes.ok || !canvasRes.ok) {
-          throw new Error('Error al cargar los archivos');
-        }
-        return Promise.all([jsonRes.json(), canvasRes.json()]);
-      })
-      .then(([jsonData, canvasData]) => {
-        const canvasElement = document.getElementById('canvas');
-        
-        console.log("Datos del JSON:", jsonData); // Depuración: ver datos del JSON
-        console.log("Datos del Canvas:", canvasData); // Depuración: ver datos del Canvas
+    // Función para cargar y procesar el JSON
+    fetch(jsonURL)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Datos JSON cargados:', data);
+        const canvas = document.getElementById('canvas');
+        data.objects.forEach(object => {
+          const div = document.createElement('div');
+          div.className = 'node';
+          div.style.left = object.x + 'px';
+          div.style.top = object.y + 'px';
+          div.style.width = object.width + 'px';
+          div.style.height = object.height + 'px';
+          div.style.backgroundColor = object.backgroundColor || '#f0f0f0';
 
-        // Procesar los nodos del JSON
-        jsonData.nodes.forEach(node => {
-          const nodeDiv = document.createElement('div');
-          nodeDiv.classList.add('node');
-          nodeDiv.style.left = node.x + 'px';
-          nodeDiv.style.top = node.y + 'px';
-          nodeDiv.style.width = node.width + 'px';
-          nodeDiv.style.height = node.height + 'px';
-          nodeDiv.style.backgroundColor = node.color || '#f0f0f0';
-          nodeDiv.style.fontSize = node.fontSize || '16px';
-
-          const text = node.text.trim();
-
-          // Si el nodo tiene un enlace de imagen
-          if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('media') || text.includes('cdn.kinopio')) {
+          // Si el texto contiene un enlace de imagen
+          if (object.text && object.text.match(/\.(jpg|jpeg|png|gif)$/i)) {
             const img = document.createElement('img');
-            img.src = text;
-            nodeDiv.appendChild(img);
-          }
-          // Si el nodo es un enlace de Spotify, lo insertamos como un botón
-          else if (text.includes('open.spotify.com')) {
-            const button = document.createElement('a');
-            button.href = text;
-            button.target = "_blank";
-            button.classList.add('button');
-            button.textContent = 'Escuchar en Spotify';
-            nodeDiv.appendChild(button);
-          }
-          // Si es un enlace a otra página (como GitHub), lo insertamos como un botón
-          else if (text.includes('github.com')) {
-            const button = document.createElement('a');
-            button.href = text;
-            button.target = "_blank";
-            button.classList.add('button');
-            button.textContent = 'Ver en GitHub';
-            nodeDiv.appendChild(button);
-          }
-          // Si el nodo es solo texto
-          else {
-            nodeDiv.innerText = text;
+            img.src = object.text;
+            div.appendChild(img);
+          } else if (object.text && object.text.includes('open.spotify.com')) {
+            const iframe = document.createElement('iframe');
+            iframe.src = object.text.replace('/track/', '/embed/track/');
+            iframe.width = '100%';
+            iframe.height = '80';
+            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+            iframe.loading = 'lazy';
+            iframe.frameBorder = '0';
+            div.appendChild(iframe);
+          } else if (object.text) {
+            div.innerText = object.text;
           }
 
-          canvasElement.appendChild(nodeDiv);
-        });
-
-        // Procesar las conexiones del canvas (si las hay)
-        canvasData.edges.forEach(edge => {
-          const fromNode = document.getElementById(edge.fromNode);
-          const toNode = document.getElementById(edge.toNode);
-          
-          if (fromNode && toNode) {
-            const line = document.createElement('div');
-            line.style.position = 'absolute';
-            line.style.width = '2px';
-            line.style.backgroundColor = '#ff69b4';
-            // Crear la línea (flecha) entre los nodos
-            const fromRect = fromNode.getBoundingClientRect();
-            const toRect = toNode.getBoundingClientRect();
-
-            line.style.left = fromRect.left + (fromRect.width / 2) + 'px';
-            line.style.top = fromRect.top + (fromRect.height / 2) + 'px';
-            line.style.height = Math.abs(fromRect.top - toRect.top) + 'px';
-
-            canvasElement.appendChild(line);
-          }
+          canvas.appendChild(div);
         });
       })
       .catch(error => {
-        console.error('Error al cargar los archivos:', error);
+        console.error('Error al cargar el JSON:', error);
+        document.body.innerHTML = "No se pudo cargar el archivo JSON.";
+      });
+
+    // Cargar el archivo Canvas (ver si realmente necesitamos este)
+    fetch(canvasURL)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Datos Canvas cargados:', data);
+        // Asegúrate de procesar los nodos de canvas si es necesario.
+        // Aquí también puedes añadir más lógica si es necesario para el lienzo.
+      })
+      .catch(error => {
+        console.error('Error al cargar el Canvas:', error);
+        document.body.innerHTML += "<br>No se pudo cargar el archivo Canvas.";
       });
   </script>
 </body>
