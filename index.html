@@ -18,12 +18,17 @@
       left: 0;
       height: 100%;
       width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     iframe {
-      height: 100%;
-      width: 100%;
       border: none;
+      transition: transform 0.3s ease;
+      transform-origin: center center;
+      max-width: none;
+      max-height: none;
     }
 
     .mensaje-amor {
@@ -50,10 +55,8 @@
       }
     }
 
-    .boton-musica {
+    .boton-musica, .zoom-control {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
       padding: 12px 18px;
       font-size: 1em;
       background: #fff;
@@ -61,14 +64,29 @@
       color: #ff69b4;
       border-radius: 12px;
       box-shadow: 0 0 10px #ff69b480;
-      z-index: 1000;
       cursor: pointer;
       transition: all 0.3s ease;
+      z-index: 1000;
     }
 
-    .boton-musica:hover {
+    .boton-musica:hover, .zoom-control:hover {
       background-color: #ffe6f0;
       color: #d61b78;
+    }
+
+    .boton-musica {
+      bottom: 20px;
+      right: 20px;
+    }
+
+    .zoom-controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
     }
 
     .emoji {
@@ -113,16 +131,23 @@
   </div>
 
   <div class="kinopio-embed">
-    <iframe src="https://kinopio.club/embed/?spaceId=8UGIFw8MmL2t1Dfgz-GUE&zoom=91"></iframe>
+    <iframe id="kinopioFrame" src="https://kinopio.club/embed/?spaceId=8UGIFw8MmL2t1Dfgz-GUE&zoom=91"></iframe>
   </div>
 
   <audio id="musica" src="https://lyhuwu.github.io/Para-Anita-/audio/if-ain_t-got-you-Alicia-Keys-_Lyrics-Español_Inglés_-SlaterArt.mp3" loop></audio>
 
   <button id="botonMusica" class="boton-musica">🎵 Reproducir música</button>
 
+  <div class="zoom-controls">
+    <button class="zoom-control" id="zoomIn">🔍 +</button>
+    <button class="zoom-control" id="zoomOut">🔎 −</button>
+  </div>
+
   <script>
     const musica = document.getElementById("musica");
     const boton = document.getElementById("botonMusica");
+    const iframe = document.getElementById("kinopioFrame");
+    let zoomLevel = 1;
 
     boton.addEventListener("click", async () => {
       try {
@@ -149,6 +174,17 @@
       }
     });
 
+    // Zoom manual visual (escala)
+    document.getElementById('zoomIn').addEventListener('click', () => {
+      zoomLevel = Math.min(2, zoomLevel + 0.1);
+      iframe.style.transform = `scale(${zoomLevel})`;
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', () => {
+      zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+      iframe.style.transform = `scale(${zoomLevel})`;
+    });
+
     // Corazones flotantes
     const emojis = ['💜', '💙'];
     for (let i = 0; i < 30; i++) {
@@ -163,9 +199,7 @@
     }
 
     // Ocultar mensaje de carga cuando se cargue el iframe
-    const iframe = document.querySelector('.kinopio-embed iframe');
     const mensaje = document.getElementById('mensajeCarga');
-
     iframe.addEventListener('load', () => {
       mensaje.style.display = 'none';
     });
@@ -181,4 +215,3 @@
 
 </body>
 </html>
-
