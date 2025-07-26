@@ -28,6 +28,20 @@
       word-wrap: break-word;
       text-align: center;
     }
+    .kinopio-header {
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
+      font-size: 24px;
+      color: #2c3e50;
+      text-align: center;
+    }
+    .kinopio-subheader {
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
+      font-size: 18px;
+      color: #34495e;
+      text-align: center;
+    }
     .kinopio-image {
       position: absolute;
       display: block;
@@ -46,7 +60,7 @@
 
   <script>
     // URL del archivo .canvas en GitHub (reemplaza esta URL con tu enlace raw)
-    const canvasURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas";
+    const canvasURL = "https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/main/Ayayayayaay.canvas";
 
     // Función para cargar y procesar el archivo .canvas
     fetch(canvasURL)
@@ -63,13 +77,19 @@
           // Si el nodo es de tipo texto, lo procesamos
           if (node.type === "text") {
             const textElement = document.createElement('div');
-            textElement.classList.add('kinopio-text');
-            textElement.textContent = node.text;
+            // Ajustamos el tipo de texto según el formato (markdown)
+            if (node.text.startsWith("##")) {
+              textElement.classList.add('kinopio-subheader');
+              textElement.textContent = node.text.slice(2).trim(); // Eliminar "##" del inicio
+            } else if (node.text.startsWith("#")) {
+              textElement.classList.add('kinopio-header');
+              textElement.textContent = node.text.slice(1).trim(); // Eliminar "#" del inicio
+            } else {
+              textElement.classList.add('kinopio-text');
+              textElement.textContent = node.text;
+            }
 
-            // Ajustar el tamaño de la fuente basado en la altura y el ancho si es necesario
-            textElement.style.fontSize = `${node.height / 10}px`;  // Ajustar el tamaño de la fuente según el alto
-
-            // Aplicamos estilo de posición (x, y) y otros atributos
+            // Aplicamos las posiciones y otros estilos del nodo
             textElement.style.left = `${node.x}px`;
             textElement.style.top = `${node.y}px`;
             textElement.style.width = `${node.width}px`;
@@ -80,8 +100,8 @@
             kinopioItem.appendChild(textElement);
           }
 
-          // Si el nodo es de tipo imagen o gif, lo procesamos
-          if (node.type === "text" && node.text && (node.text.includes("http") || node.text.includes("https"))) {
+          // Si el nodo contiene una URL de imagen o gif
+          if (node.text && (node.text.includes("http") || node.text.includes("https"))) {
             const imgElement = document.createElement('img');
             imgElement.src = node.text;  // Usamos el texto como URL de la imagen
             imgElement.classList.add('kinopio-image');
