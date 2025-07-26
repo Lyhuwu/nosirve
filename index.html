@@ -19,26 +19,23 @@
       height: 100vh;
       overflow: hidden;
       background-color: white;
-      padding: 40px;
       box-sizing: border-box;
-      border-radius: 12px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      padding: 40px;
       margin: 0 auto;
     }
 
     /* Estilo para los nodos (cuadros de texto) */
     .node {
       position: absolute;
-      padding: 15px 20px;
       font-size: 18px;
       background-color: #cfe7ff;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       font-family: 'Segoe UI', sans-serif;
       color: #333;
-      z-index: 10;
       white-space: pre-wrap;
       word-wrap: break-word;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     /* Estilo para imágenes (sin márgenes, manteniendo el tamaño original) */
@@ -67,13 +64,6 @@
     .button-link:hover {
       background-color: #17a44d;
     }
-
-    /* Decoraciones visuales */
-    .node .emoji {
-      font-size: 30px;
-      margin-right: 8px;
-    }
-
   </style>
 </head>
 <body>
@@ -91,7 +81,7 @@
           const div = document.createElement('div');
           div.className = 'node';
 
-          // Ajustar la posición (x, y)
+          // Ajustar la posición (x, y) de acuerdo a las coordenadas del canvas
           div.style.left = node.x + 'px';
           div.style.top = node.y + 'px';
 
@@ -101,6 +91,8 @@
           if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('cdn.kinopio')) {
             const img = document.createElement('img');
             img.src = text;
+            img.style.width = node.width + 'px';  // Ajustar el tamaño de la imagen según el canvas
+            img.style.height = node.height + 'px'; // Ajustar la altura de la imagen según el canvas
             div.appendChild(img);
           }
           // Si es un enlace de Spotify, lo mostramos como un botón bonito
@@ -127,8 +119,8 @@
 
             // Ajustar el tamaño de la tarjeta de texto según el tamaño del texto
             div.style.fontSize = node.fontSize ? node.fontSize + 'px' : '18px';
-            div.style.width = node.width ? node.width + 'px' : 'auto';
-            div.style.height = node.height ? node.height + 'px' : 'auto';
+            div.style.width = node.width + 'px';  // Ajuste del ancho basado en el canvas
+            div.style.height = node.height + 'px';  // Ajuste de la altura basado en el canvas
           }
 
           // Añadir el nodo (div) al lienzo
