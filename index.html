@@ -16,6 +16,7 @@
       width: 100%;
       height: 100vh;
       overflow: auto;
+      background: #fff; /* Fondo blanco para ver los elementos */
     }
     .kinopio-item {
       position: absolute;
@@ -25,6 +26,11 @@
       color: #000;
       font-size: 16px;
       word-wrap: break-word;
+      text-align: center;
+    }
+    .kinopio-image {
+      position: absolute;
+      display: block;
     }
   </style>
 </head>
@@ -58,6 +64,9 @@
             textElement.classList.add('kinopio-text');
             textElement.textContent = node.text;
 
+            // Ajustar el tamaño de la fuente basado en la altura y el ancho si es necesario
+            textElement.style.fontSize = `${node.height / 10}px`;  // Ajustar el tamaño de la fuente según el alto
+
             // Aplicamos estilo de posición (x, y) y otros atributos
             textElement.style.left = `${node.x}px`;
             textElement.style.top = `${node.y}px`;
@@ -67,6 +76,22 @@
 
             // Añadir el texto al item
             kinopioItem.appendChild(textElement);
+          }
+
+          // Si el nodo es de tipo imagen, lo procesamos
+          if (node.type === "image" && node.image) {
+            const imgElement = document.createElement('img');
+            imgElement.src = node.image;  // Usamos la URL de la imagen desde el JSON
+            imgElement.classList.add('kinopio-image');
+
+            // Ajustamos las dimensiones y la posición de la imagen
+            imgElement.style.left = `${node.x}px`;
+            imgElement.style.top = `${node.y}px`;
+            imgElement.style.width = `${node.width}px`;
+            imgElement.style.height = `${node.height}px`;
+
+            // Añadir la imagen al item
+            kinopioItem.appendChild(imgElement);
           }
 
           // Añadir el item al contenedor
