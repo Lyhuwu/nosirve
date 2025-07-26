@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Feliz aniversario amor mío</title>
@@ -7,7 +7,7 @@
     body {
       margin: 0;
       background-color: #0d0d0d;
-      font-family: sans-serif;
+      font-family: 'Comic Sans MS', sans-serif;
     }
 
     #canvas {
@@ -18,19 +18,25 @@
 
     .node {
       position: absolute;
-      background: pink;
-      border: 2px solid #fff;
-      border-radius: 12px;
-      padding: 10px;
+      background: rgba(255, 182, 193, 0.9); /* rosita */
+      border: 2px solid white;
+      border-radius: 16px;
+      padding: 12px;
       color: black;
+      white-space: pre-wrap;
+      max-width: 300px;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
   <div id="canvas"></div>
 
-  <!-- Aquí va el script -->
   <script src="script.js"></script>
 </body>
 </html>
