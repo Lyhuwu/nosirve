@@ -1,35 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Lienzo Kinopio</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renderizar Canvas y JSON</title>
   <style>
     body {
+      font-family: sans-serif;
       margin: 0;
-      background: #f9f9f9;
+      background-color: #f7f7f7;
     }
     #canvas {
       position: relative;
-      width: 100%;
-      height: 100vh;
-      background: white;
-      overflow: visible;
+      background-color: white;
       border: 2px dashed pink;
+      margin: 20px auto;
+      overflow: visible;
     }
     .node {
       position: absolute;
       box-sizing: border-box;
-      border-radius: 12px;
-      padding: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      word-wrap: break-word;
       white-space: pre-wrap;
-      overflow-wrap: break-word;
-      font-family: sans-serif;
-      font-size: 16px;
     }
     .node img {
       max-width: 100%;
       max-height: 100%;
+      border-radius: 8px;
+    }
+    .node iframe {
       border-radius: 8px;
     }
   </style>
@@ -38,50 +39,51 @@
   <div id="canvas"></div>
 
   <script>
-    // Cargar el archivo JSON
-    const jsonURL = 'https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.json';
-    const canvasURL = 'https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas';
-
-    // Función para cargar y procesar el JSON
-    fetch(jsonURL)
+    // Cargar JSON desde GitHub
+    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.json')
       .then(response => response.json())
-      .then(data => {
-        console.log('Datos JSON cargados:', data);
+      .then(jsonData => {
+        console.log("Datos JSON cargados:", jsonData);
 
-        // Asegurarnos de que los nodos existen en la respuesta
-        // Revisamos la estructura para acceder correctamente a los nodos
-        const nodes = data.nodes || []; // O data['nodes'] dependiendo de cómo esté estructurado el JSON
+        const canvas = document.getElementById('canvas');
+        
+        // Verificar si hay nodos en el JSON
+        if (jsonData.nodes && Array.isArray(jsonData.nodes)) {
+          jsonData.nodes.forEach(node => {
+            const nodeDiv = document.createElement('div');
+            nodeDiv.classList.add('node');
+            nodeDiv.style.left = node.x + 'px';
+            nodeDiv.style.top = node.y + 'px';
+            nodeDiv.style.width = node.width + 'px';
+            nodeDiv.style.height = node.height + 'px';
+            nodeDiv.style.backgroundColor = node.backgroundColor || '#f0f0f0';
 
-        if (nodes.length > 0) {
-          const canvas = document.getElementById('canvas');
-          nodes.forEach(node => {
-            const div = document.createElement('div');
-            div.className = 'node';
-            div.style.left = node.x + 'px';
-            div.style.top = node.y + 'px';
-            div.style.width = node.width + 'px';
-            div.style.height = node.height + 'px';
-            div.style.backgroundColor = node.color || '#f0f0f0';
+            const text = node.text.trim();
 
-            // Si el texto contiene un enlace de imagen
-            if (node.text && node.text.match(/\.(jpg|jpeg|png|gif)$/i)) {
+            // Verificar si el texto es un enlace de imagen, gif o Spotify
+            if (text.match(/\.(jpg|jpeg|png|gif)$/i) || text.includes('media') || text.includes('cdn.kinopio')) {
               const img = document.createElement('img');
-              img.src = node.text;
-              div.appendChild(img);
-            } else if (node.text && node.text.includes('open.spotify.com')) {
+              img.src = text;
+              nodeDiv.appendChild(img);
+            } 
+            // Verificar si el texto es un enlace de Spotify
+            else if (text.includes('open.spotify.com')) {
               const iframe = document.createElement('iframe');
-              iframe.src = node.text.replace('/track/', '/embed/track/');
+              iframe.src = text.replace('/track/', '/embed/track/');
               iframe.width = '100%';
               iframe.height = '80';
               iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
               iframe.loading = 'lazy';
               iframe.frameBorder = '0';
-              div.appendChild(iframe);
-            } else if (node.text) {
-              div.innerText = node.text;
+              nodeDiv.appendChild(iframe);
+            }
+            // Si es texto normal
+            else {
+              nodeDiv.innerText = text;
             }
 
-            canvas.appendChild(div);
+            // Añadir el nodo al canvas
+            canvas.appendChild(nodeDiv);
           });
         } else {
           console.error('No se encontraron nodos en el JSON.');
@@ -89,20 +91,6 @@
       })
       .catch(error => {
         console.error('Error al cargar el JSON:', error);
-        document.body.innerHTML = "No se pudo cargar el archivo JSON.";
-      });
-
-    // Cargar el archivo Canvas (ver si realmente necesitamos este)
-    fetch(canvasURL)
-      .then(response => response.json())
-      .then(data => {
-        console.log('Datos Canvas cargados:', data);
-        // Asegúrate de procesar los nodos de canvas si es necesario.
-        // Aquí también puedes añadir más lógica si es necesario para el lienzo.
-      })
-      .catch(error => {
-        console.error('Error al cargar el Canvas:', error);
-        document.body.innerHTML += "<br>No se pudo cargar el archivo Canvas.";
       });
   </script>
 </body>
