@@ -48,31 +48,32 @@
       .then(data => {
         console.log('Datos JSON cargados:', data);
         const canvas = document.getElementById('canvas');
-        data.objects.forEach(object => {
+        // Accede a la propiedad nodes (en lugar de objects)
+        data.nodes.forEach(node => {
           const div = document.createElement('div');
           div.className = 'node';
-          div.style.left = object.x + 'px';
-          div.style.top = object.y + 'px';
-          div.style.width = object.width + 'px';
-          div.style.height = object.height + 'px';
-          div.style.backgroundColor = object.backgroundColor || '#f0f0f0';
+          div.style.left = node.x + 'px';
+          div.style.top = node.y + 'px';
+          div.style.width = node.width + 'px';
+          div.style.height = node.height + 'px';
+          div.style.backgroundColor = node.color || '#f0f0f0';
 
           // Si el texto contiene un enlace de imagen
-          if (object.text && object.text.match(/\.(jpg|jpeg|png|gif)$/i)) {
+          if (node.text && node.text.match(/\.(jpg|jpeg|png|gif)$/i)) {
             const img = document.createElement('img');
-            img.src = object.text;
+            img.src = node.text;
             div.appendChild(img);
-          } else if (object.text && object.text.includes('open.spotify.com')) {
+          } else if (node.text && node.text.includes('open.spotify.com')) {
             const iframe = document.createElement('iframe');
-            iframe.src = object.text.replace('/track/', '/embed/track/');
+            iframe.src = node.text.replace('/track/', '/embed/track/');
             iframe.width = '100%';
             iframe.height = '80';
             iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
             iframe.loading = 'lazy';
             iframe.frameBorder = '0';
             div.appendChild(iframe);
-          } else if (object.text) {
-            div.innerText = object.text;
+          } else if (node.text) {
+            div.innerText = node.text;
           }
 
           canvas.appendChild(div);
