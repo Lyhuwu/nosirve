@@ -1,245 +1,281 @@
-:root {
-  --biscuit: #5D4037;
-  --icing: #fff;
-  --fill: #F6D8D1;
-  --purple: #94AEFF;
-  --grey: #ccc;
-  --green: #008773;
-  --sky: #0CBAE8;
-  --rose: #D16D6B;
-}
 
-* {
-  padding: 0;
+@import url('https://fonts.googleapis.com/css2?family=Cookie&family=Rouge+Script&display=swap');
+
+// CAKE VARIABLES
+
+$plate-width: 250px;
+$plate-height: 75px;
+$plate-padding: 20px;
+
+$base-width: $plate-width - $plate-padding - 30px;
+$base-height: 50px;
+$base-top-height: $plate-height - 10px;
+
+$base-bg: rgb(197,165,192);
+$cream-bg: #b381ae;
+
+// CANDLE VARIABLES
+
+$candle-width: 15px;
+$candle-height: 75px;
+$flame-height: 30px;
+$star-size: 15px;
+
+$candle-bg: repeating-linear-gradient(45deg, #eee, #f0abf0 20%);
+$candle-top-bg: radial-gradient(#eee, #f0abf0);
+$flame-bg: #fcc56c;
+$star-bg: orange;
+
+*, *:before, *:after{
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.svg {
+  position: absolute;
+  width: 0;
+  height: 0;
 }
 
-body {
-  background-color: var(--purple);
+%center{
+  display: grid;
+  place-items: center;
 }
 
-p {
-  margin-top: 1vh;
-  text-align: center;
-  color: var(--rose);
-  text-transform: capitalize;
-  font-family: 'Josefin Sans';
-  font-weight: 400;
-  font-size: 1.5em;
-  text-shadow: 5px 5px 10px var(--sky);
-
-}
-
-.box {
-  display: box;
+.wrapper{
   position: relative;
-  width: 700px;
-  height: 700px;
-  margin: auto;
+  height: 100vh;
+  min-height: 600px;
+  background: linear-gradient(to top, #eee, transparent);
+  @extend %center;
 }
 
-.plate {
-  position: absolute;
-  width: 70%;
-  height: 40%;
+.greeting{
+  font-family: 'Cookie', cursive;
+  font-size: 4rem;
+  color: #444;
+  transform: scale(0);
+}
+.message{
+  font-family: 'Cookie', cursive;
+  font-size: 2.5rem;
+  color: #777;
+}
+
+.plate{
+  position: relative;
+  width: $plate-width;
+  height: $plate-height;
+  background: #f1f1f1;
+  margin-top: 0;
   border-radius: 50%;
-  background: var(--grey);
-  bottom: 10%;
-  left: 15%;
-  box-shadow: -7px 25px 53px -2px rgba(0, 0, 0, 0.78);
+  box-shadow: 0px 3px 5px 0px #aaa;
+  @extend %center;
 }
-
-.layer,
-.icing {
-  background: var(--biscuit);
+.cake-wrap{
   position: absolute;
-  bottom: 17.5%;
-  left: 23%;
-  width: 55%;
-  height: 35%;
-  border-radius: 50%;
+  bottom: 50%;
 }
-
-.layer:nth-of-type(2) {
-  background: var(--biscuit);
-  bottom: 33%;
-  height: 33%;
-  z-index: 1;
-}
-
-
-.layer::after,
-.layer:before {
-  content: '';
-  position: absolute;
-  top: -10%;
-  bottom: -10%;
-  height: 70%;
-  width: 100%;
-  border-radius: 50%;
-  background: var(--biscuit);
-}
-
-.layer::before {
-  bottom: 10%;
-  top: 10%;
-}
-
-.fill {
-  background: var(--fill);
-  border: 2px solid var(--fill);
-  position: absolute;
-  bottom: 20%;
-  left: -.5%;
-  width: 100%;
-  height: 80%;
-  border-radius: 50%;
-}
-
-.icing {
-  background: white;
-  top: 27%;
-  height: 25%;
-  z-index: 2;
-}
-
-.icing-sm {
-  position: absolute;
-  background: white;
-  height: 50%;
-  width: 10%;
-  border-top-left-radius: 25%;
-  border-top-right-radius: 25%;
-  border-bottom-left-radius: 50%;
-  border-bottom-right-radius: 50%;
-  top: 45%;
-  box-shadow: -18px 35px 60px -10px rgba(0, 0, 0, 0.78);
-}
-
-.icing-sm:nth-of-type(2) {
-  height: 70%;
-  top: 70%;
-  left: 25%;
-}
-
-.icing-sm:nth-of-type(3) {
-  width: 15%;
-  height: 80%;
-  top: 50%;
-  right: 15%;
-  box-shadow: 0 60px 100px -10px rgba(0, 0, 0, 0.78);
-}
-
-.icing-sm:nth-of-type(4),
-.icing-sm:nth-of-type(5),
-.icing-sm:nth-of-type(6) {
-  height: 30%;
-  width: 7%;
-  top: 85%;
-  left: 45%;
-  background: white;
-}
-
-.icing-sm:nth-of-type(5) {
-  left: 12%;
-  top: 70%;
-}
-
-.icing-sm:nth-of-type(6) {
-  left: 92%;
-  top: 56%;
-  background: white;
-}
-
-.candles {
-  position: absolute;
-  height: 30%;
-  width: 50%;
-  left: 25%;
-  top: 20%;
-  z-index: 3;
-}
-
-.candle {
-  position: absolute;
-  background-color: var(--rose);
-  width: 5%;
-  height: 30%;
-  border-radius: 10px / 4px;
-  top: 5%;
-  left: 50%;
-  margin-left: -8px;
-  z-index: 10;
-}
-
-.candle:nth-of-type(2) {
-  top: 20%;
-  left: 25%;
-}
-
-.candle:nth-of-type(3) {
-  top: 20%;
-  left: 75%;
-}
-
-.candle::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: var(--rose);
-}
-
-.flame {
-  position: absolute;
-  background-color: orange;
-  width: 90%;
-  height: 55%;
-  border-radius: 10px 10px 10px 10px / 25px 25px 10px 10px;
-  top: -55%;
-  left: 50%;
-  margin-left: -40%;
-  transform-origin: 50% 90%;
-  animation: flicker 1s ease-in-out alternate infinite;
-}
-
-@media all and (max-width:600px) {
-  .box {
-    width: 500px;
-    height: 400px;
+.cake-base{
+  position: relative;
+  width: $base-width;
+  height: $base-height;
+  background: $base-bg;
+  // clip-path: url(#my-clip-path);
+  .base-front{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    &:after{
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      height: $plate-height - $plate-padding;
+      transform: translatey(-50%);
+      background: inherit;
+      border-radius: 50%;
+      // clip-path: polygon( 0 100%, 100% 100%, 100% 50%, 0 50%);
+    }
+  }
+  .base-top{
+    position: absolute;
+    width: 100%;
+    height: $base-top-height;
+    top: 0;
+    transform: translatey(-50%);
+    border-radius: 50%;
+    background: inherit;
+    &:before{
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      clip-path: polygon(0 0, 0% 50%, 100% 50%, 100% 0);
+    }
+    &:after{
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      // border: 1px solid transparent;
+      border-bottom-color: black;
+      clip-path: polygon(0 50%, 60% 50%, 60% 101%, 0 101%);
+    }
   }
 }
 
-@media all and (max-width:400px) {
-  .box {
-    width: 300px;
-    height: 200px;
+.cake-topping{
+  position: absolute;
+  bottom: 0%;
+  width: $base-width;
+  height: $base-height * 2;
+  z-index: 99;
+  .topping-front{
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, $cream-bg 40%, transparent);
+    // background: chocolate;
+    // clip-path: url('#my-clip-path');
+    .top-layer{
+      height: 30%;
+      background: $cream-bg;
+    }
+    .bottom-layer{
+      position: relative;
+      height: 70%;
+      background: $cream-bg;
+      clip-path: url('#my-clip-path');
+      
+    }
+    
+    
+  }
+  .topping-top{
+    background: $cream-bg;
+    position: absolute;
+    width: 100%;
+    height: $base-top-height;
+    top: 0;
+    transform: translatey(-50%);
+    border-radius: 50%;
+    z-index: 9;
+    &:before{
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      clip-path: polygon(0 0, 0% 50%, 100% 50%, 100% 0);
+    }
+    &:after{
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      // border: 2px solid transparent;
+      // border-bottom-color: rgb(200,169,195);
+      box-shadow: inset 0 -1px 1px 2px rgba(200,169,195, 0.5);
+      clip-path: polygon(10% 50%, 70% 50%, 70% 101%, 10% 101%);
+    }
   }
 }
 
-@keyframes flicker {
-  0% {
-    transform: skewX(5deg);
+.candle-container{
+  width: $base-width;
+  position: absolute;
+  bottom: 60%;
+  z-index: 9999;
+  @extend %center; 
+  opacity: 0;
+  .candle-wrap{
+    position: relative;
+    width: $candle-width;
   }
-
-  25% {
-    transform: skewX(-5deg);
+  .flame-wrap{
+    position: relative;
+    z-index: 99;
+    width: 100%;
+    background: $flame-bg;
+    height: $flame-height;
+    transform-origin: bottom center;
+    transform: scale(0);
+    clip-path: url(#my-flame-path);
   }
-
-  50% {
-    transform: skewX(10deg);
+  .candle-top{
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translatey(-50%);
+    width: 100%;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    z-index: 9;
+    background: $candle-top-bg;
   }
-
-  75% {
-    transform: skewX(-10deg);
+  .candle-base{
+    position: relative;
+    width: 100%;
+    height: $candle-height;
+    margin: 2px 0;
+    background: $candle-bg;
+    &:before{
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background: #eee;
+      transform: translateY(50%);
+      height: 5px;
+      width: 100%;
+      z-index: -1;
+      border-radius: 50%;
+    }
+    &:after{
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 50%);
+      height: 10px;
+      width: 200%;
+      border-radius: 50%;
+      background: radial-gradient(#9e7199, $cream-bg);
+      z-index: -2;
+    }
   }
-
-  100% {
-    transform: skewX(5deg);
- .flame.off {
-  display: none; /* Las llamas desaparecen al hacer click */
+  .star{
+    width: $star-size;
+    height: $star-size;
+    position: absolute;
+    background-color: $star-bg;
+    clip-path: url(#my-star-path);
+    opacity: 0;
+    &:nth-of-type(1){
+      top: -20%;
+      left: 30%;
+    }
+    &:nth-of-type(2){
+      top: 30%;
+      left: 10%;
+    }
+    &:nth-of-type(3){
+      top: -10%;
+      left: 85%;
+    }
+    &:nth-of-type(4){
+      top: 35%;
+      left: 65%;
+    }
+    &:nth-of-type(5){
+      top: 55%;
+      left: 90%;
+    }
+  }
 }
-
