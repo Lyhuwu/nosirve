@@ -1,220 +1,132 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Feliz Cumpleaños 💙</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #002b80; /* Azul fuerte */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: 'Arial', sans-serif;
-      color: white;
-      overflow: hidden;
-      flex-direction: column;
-      position: relative;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Cumpleaños!</title>
+    <style>
+        body {
+            background-color: #ADD8E6; /* Azul pastel */
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            color: #4682B4; /* Azul acero para el texto */
+        }
 
-    .cake {
-      position: relative;
-      width: 200px;
-      height: 150px;
-      background: #ffb3b3;
-      border-radius: 10px 10px 0 0;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    }
+        #confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
 
-    .cake::before {
-      content: '';
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 120px;
-      height: 40px;
-      background: #ff9999;
-      border-radius: 10px;
-    }
+        #mensaje {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
 
-    .candle {
-      position: absolute;
-      width: 10px;
-      height: 30px;
-      background: white;
-      top: -50px;
-      border-radius: 2px;
-    }
+        #pastel {
+            cursor: pointer;
+            width: 300px;
+            height: auto;
+            margin-top: 20px;
+        }
+        
+        .vela {
+            fill: yellow;
+            stroke: black;
+            stroke-width: 2;
+        }
 
-    .candle:nth-child(1) { left: 30px; }
-    .candle:nth-child(2) { left: 90px; }
-    .candle:nth-child(3) { left: 150px; }
+        /* Animación para las velas */
+        .llama {
+            fill: orange;
+            stroke: none;
+            animation: flame-flicker 1s infinite;
+        }
 
-    .flame {
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 10px;
-      height: 20px;
-      background: orange;
-      border-radius: 50%;
-      opacity: 0;
-    }
-
-    /* Animaciones de la llama */
-    @keyframes flicker {
-      0% { transform: translateX(-50%) scale(1); opacity: 1; }
-      50% { transform: translateX(-50%) scale(1.1); opacity: 0.8; }
-      100% { transform: translateX(-50%) scale(1); opacity: 1; }
-    }
-
-    @keyframes flameOn {
-      0% { transform: translateX(-50%) scale(0); opacity: 0; }
-      50% { transform: translateX(-50%) scale(1.3); opacity: 1; }
-      100% { transform: translateX(-50%) scale(1); opacity: 1; }
-    }
-
-    @keyframes blowOut {
-      0% { transform: translateX(-50%) scale(1); opacity: 1; }
-      50% { transform: translateX(-50%) scale(0.5); opacity: 0.6; }
-      100% { transform: translateX(-50%) scale(0); opacity: 0; }
-    }
-
-    /* Humo */
-    .smoke {
-      position: absolute;
-      top: -25px;
-      left: 50%;
-      width: 8px;
-      height: 30px;
-      background: radial-gradient(circle, rgba(200,200,200,0.7), transparent);
-      border-radius: 50%;
-      transform: translateX(-50%) scale(0.5);
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    @keyframes smokeUp {
-      0% { opacity: 0.7; transform: translateX(-50%) translateY(0) scale(0.5); }
-      100% { opacity: 0; transform: translateX(-50%) translateY(-40px) scale(1.5); }
-    }
-
-    /* Mensaje final */
-    #wishMessage {
-      display: none;
-      margin-top: 40px;
-      font-size: 2em;
-      animation: fadeIn 2s forwards;
-      text-align: center;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Confeti */
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: red;
-      top: -10px;
-      animation: fall linear forwards;
-      opacity: 0.9;
-    }
-
-    @keyframes fall {
-      to {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 1;
-      }
-    }
-  </style>
+        @keyframes flame-flicker {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="cake" onclick="makeWish()">
-    <div class="candle">
-      <div class="flame"></div>
+    <div id="confetti-container"></div>
+    
+    <div id="mensaje">
+        Feliz cumpleaños amor mio, pide un deseo
     </div>
-    <div class="candle">
-      <div class="flame"></div>
-    </div>
-    <div class="candle">
-      <div class="flame"></div>
-    </div>
-  </div>
 
-  <div id="wishMessage">🎂 ¡Feliz cumpleaños amor mío! 💖</div>
+    <svg id="pastel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+        <path d="M50 250 Q250 350, 450 250" fill="#B0E0E6" stroke="#87CEFA" stroke-width="5" />
+        <rect x="50" y="150" width="400" height="100" fill="#B0E0E6" stroke="#87CEFA" stroke-width="5" />
+        
+        <rect class="vela" x="150" y="100" width="20" height="50" rx="5" ry="5" />
+        <rect class="vela" x="330" y="100" width="20" height="50" rx="5" ry="5" />
+        
+        <circle class="llama" id="llama1" cx="160" cy="95" r="8" />
+        <circle class="llama" id="llama2" cx="340" cy="95" r="8" />
 
-  <script>
-    // Encender velas al cargar
-    window.onload = () => {
-      document.querySelectorAll('.flame').forEach(flame => {
-        flame.style.animation = "flameOn 0.8s ease-out, flicker 0.3s infinite 0.8s";
-      });
-    };
+        <text id="numero2" x="160" y="130" font-family="Arial" font-size="60" font-weight="bold" fill="white" text-anchor="middle" />
+        <text id="numero3" x="340" y="130" font-family="Arial" font-size="60" font-weight="bold" fill="white" text-anchor="middle" />
+    </svg>
 
-    function makeWish() {
-      const candles = document.querySelectorAll('.candle');
+    <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
+    <script>
+        const confeti = new ConfettiGenerator({ target: 'confetti-container' });
+        let confetiAnimacionActiva = false;
+        
+        // Carga los datos del JSON
+        const datos = {
+            "cumpleaños": {
+                "nombre_homenajeado": "Amor mío",
+                "edad": 23,
+                "mensaje": "Feliz cumpleaños, pide un deseo."
+            },
+            "configuracion_visual": {
+                "color_fondo": "#ADD8E6",
+                "color_pastel": "#B0E0E6",
+                "url_confeti": "https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"
+            }
+        };
 
-      candles.forEach(candle => {
-        const flame = candle.querySelector('.flame');
-        flame.style.animation = "blowOut 0.7s forwards";
+        // Asigna el número 23 a las velas
+        document.getElementById('numero2').textContent = datos.cumpleaños.edad.toString()[0];
+        document.getElementById('numero3').textContent = datos.cumpleaños.edad.toString()[1];
 
-        // Añadir humo
-        const smoke = document.createElement('div');
-        smoke.classList.add('smoke');
-        candle.appendChild(smoke);
+        // Animación de confeti al primer toque/click
+        document.body.addEventListener('click', () => {
+            if (!confetiAnimacionActiva) {
+                confeti.render();
+                confetiAnimacionActiva = true;
+            }
+        });
 
-        setTimeout(() => {
-          smoke.style.animation = "smokeUp 1.5s ease-out forwards";
-        }, 700);
-      });
+        // Animación de apagar velas
+        const pastel = document.getElementById('pastel');
+        const llamas = document.querySelectorAll('.llama');
 
-      // Mostrar mensaje + confeti
-      setTimeout(() => {
-        document.getElementById('wishMessage').style.display = 'block';
-        launchConfetti();
-      }, 1200);
-    }
-
-    // Confeti 🎉
-    function launchConfetti() {
-      const colors = ["#ff3838", "#ffb347", "#00ffcc", "#7d5fff", "#ff6b81", "#f9ca24"];
-      const numConfetti = 80;
-
-      for (let i = 0; i < numConfetti; i++) {
-        const confetti = document.createElement('div');
-        confetti.classList.add('confetti');
-        document.body.appendChild(confetti);
-
-        // Posición y color aleatorio
-        confetti.style.left = Math.random() * 100 + "vw";
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.width = confetti.style.height = Math.random() * 8 + 5 + "px";
-
-        // Duración y caída
-        const duration = Math.random() * 3 + 2; // 2 a 5 segundos
-        confetti.style.animationDuration = duration + "s";
-
-        // Retraso aleatorio
-        confetti.style.animationDelay = Math.random() * 2 + "s";
-
-        // Rotación inicial
-        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-        // Eliminar después de la animación
-        setTimeout(() => { confetti.remove(); }, (duration + 2) * 1000);
-      }
-    }
-  </script>
-
+        pastel.addEventListener('click', () => {
+            llamas.forEach(llama => {
+                // Detiene la animación de parpadeo y oculta las llamas
+                llama.style.animation = 'none';
+                llama.style.display = 'none';
+            });
+            // Opcional: Mostrar un mensaje después de apagar las velas
+            alert("¡Deseo pedido!");
+        });
+    </script>
 </body>
 </html>
