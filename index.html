@@ -16,6 +16,7 @@
       color: white;
       overflow: hidden;
       flex-direction: column;
+      position: relative;
     }
 
     .cake {
@@ -61,27 +62,78 @@
       width: 10px;
       height: 20px;
       background: orange;
-      border-radius: 50% 50% 50% 50%;
-      animation: flicker 0.3s infinite;
-      opacity: 1;
+      border-radius: 50%;
+      opacity: 0;
     }
 
+    /* Animaciones de la llama */
     @keyframes flicker {
       0% { transform: translateX(-50%) scale(1); opacity: 1; }
       50% { transform: translateX(-50%) scale(1.1); opacity: 0.8; }
       100% { transform: translateX(-50%) scale(1); opacity: 1; }
     }
 
+    @keyframes flameOn {
+      0% { transform: translateX(-50%) scale(0); opacity: 0; }
+      50% { transform: translateX(-50%) scale(1.3); opacity: 1; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    @keyframes blowOut {
+      0% { transform: translateX(-50%) scale(1); opacity: 1; }
+      50% { transform: translateX(-50%) scale(0.5); opacity: 0.6; }
+      100% { transform: translateX(-50%) scale(0); opacity: 0; }
+    }
+
+    /* Humo */
+    .smoke {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      width: 8px;
+      height: 30px;
+      background: radial-gradient(circle, rgba(200,200,200,0.7), transparent);
+      border-radius: 50%;
+      transform: translateX(-50%) scale(0.5);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes smokeUp {
+      0% { opacity: 0.7; transform: translateX(-50%) translateY(0) scale(0.5); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-40px) scale(1.5); }
+    }
+
+    /* Mensaje final */
     #wishMessage {
       display: none;
       margin-top: 40px;
       font-size: 2em;
       animation: fadeIn 2s forwards;
+      text-align: center;
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Confeti */
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      top: -10px;
+      animation: fall linear forwards;
+      opacity: 0.9;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 1;
+      }
     }
   </style>
 </head>
@@ -99,13 +151,68 @@
     </div>
   </div>
 
-  <div id="wishMessage">🎂 Pide un deseo 🎉</div>
+  <div id="wishMessage">🎂 ¡Feliz cumpleaños amor mío! 💖</div>
 
   <script>
+    // Encender velas al cargar
+    window.onload = () => {
+      document.querySelectorAll('.flame').forEach(flame => {
+        flame.style.animation = "flameOn 0.8s ease-out, flicker 0.3s infinite 0.8s";
+      });
+    };
+
     function makeWish() {
-      const flames = document.querySelectorAll('.flame');
-      flames.forEach(flame => flame.style.display = 'none');
-      document.getElementById('wishMessage').style.display = 'block';
+      const candles = document.querySelectorAll('.candle');
+
+      candles.forEach(candle => {
+        const flame = candle.querySelector('.flame');
+        flame.style.animation = "blowOut 0.7s forwards";
+
+        // Añadir humo
+        const smoke = document.createElement('div');
+        smoke.classList.add('smoke');
+        candle.appendChild(smoke);
+
+        setTimeout(() => {
+          smoke.style.animation = "smokeUp 1.5s ease-out forwards";
+        }, 700);
+      });
+
+      // Mostrar mensaje + confeti
+      setTimeout(() => {
+        document.getElementById('wishMessage').style.display = 'block';
+        launchConfetti();
+      }, 1200);
+    }
+
+    // Confeti 🎉
+    function launchConfetti() {
+      const colors = ["#ff3838", "#ffb347", "#00ffcc", "#7d5fff", "#ff6b81", "#f9ca24"];
+      const numConfetti = 80;
+
+      for (let i = 0; i < numConfetti; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        document.body.appendChild(confetti);
+
+        // Posición y color aleatorio
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = confetti.style.height = Math.random() * 8 + 5 + "px";
+
+        // Duración y caída
+        const duration = Math.random() * 3 + 2; // 2 a 5 segundos
+        confetti.style.animationDuration = duration + "s";
+
+        // Retraso aleatorio
+        confetti.style.animationDelay = Math.random() * 2 + "s";
+
+        // Rotación inicial
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+        // Eliminar después de la animación
+        setTimeout(() => { confetti.remove(); }, (duration + 2) * 1000);
+      }
     }
   </script>
 
