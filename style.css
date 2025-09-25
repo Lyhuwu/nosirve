@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cookie&display=swap');
 
-/* VARIABLES */
 :root {
   --plate-width: 250px;
   --plate-height: 75px;
@@ -16,7 +15,6 @@
   --star-bg: orange;
 }
 
-/* RESET */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
@@ -69,14 +67,6 @@ body {
   width: calc(var(--plate-width) - 30px);
   height: 50px;
   background: var(--base-bg);
-  border-radius: 50%;
-}
-
-.cake-base .base-front, .cake-base .base-top {
-  width: 100%;
-  height: 100%;
-  background: inherit;
-  position: absolute;
   border-radius: 50%;
 }
 
