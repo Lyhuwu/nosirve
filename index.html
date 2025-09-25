@@ -1,232 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Feliz Cumpleaños!</title>
-    <style>
-        body {
-            background-color: #ADD8E6; /* Azul pastel */
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Arial', sans-serif;
-            color: #4682B4; /* Azul acero para el texto */
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pide tu deseo amor mio</title>
+  <style>
+    body {
+      background-color: #0f57ff;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Comic Sans MS', cursive;
+      color: white;
+      overflow: hidden;
+    }
 
-        #tsparticles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1; /* Asegura que esté detrás de todo */
-        }
+    #mensaje {
+      text-align: center;
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
 
-        #mensaje {
-            text-align: center;
-            font-size: 2.5em;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            z-index: 10;
-            margin-bottom: 20px;
-        }
+    #pastel-container {
+      width: 350px;
+      cursor: pointer;
+      z-index: 9;
+    }
 
-        #pastel-container {
-            width: 350px; /* Tamaño más grande para el pastel */
-            height: auto;
-            position: relative;
-            cursor: pointer;
-            z-index: 9; /* Asegura que el pastel esté sobre el confeti */
-        }
+    svg {
+      width: 100%;
+      height: auto;
+    }
 
-        #pastel {
-            width: 100%;
-            height: 100%;
-        }
+    /* Pastel */
+    .cake-layer {
+      fill: #ffb6c1;
+      stroke: #ff7f9f;
+      stroke-width: 3;
+    }
 
-        /* Estilos base del SVG del pastel y velas */
-        .cake-layer {
-            fill: #B0E0E6; /* Azul bajito del pastel */
-            stroke: #87CEFA;
-            stroke-width: 3;
-            animation: draw-cake 2s ease-out forwards;
-        }
-        
-        .candle-body {
-            fill: #FFD700; /* Oro para las velas */
-            stroke: #DAA520;
-            stroke-width: 2;
-            animation: draw-candle 1.5s ease-out forwards;
-        }
+    /* Velas */
+    .candle-body {
+      fill: #fffacd;
+      stroke: #f5d742;
+      stroke-width: 2;
+    }
 
-        .candle-wick {
-            stroke: #36454F; /* Gris oscuro para la mecha */
-            stroke-width: 1;
-            animation: draw-wick 1s ease-out forwards;
-        }
+    .candle-wick {
+      stroke: #222;
+      stroke-width: 2;
+    }
 
-        .flame {
-            fill: orange;
-            stroke: red;
-            stroke-width: 0.5;
-            transform-origin: center bottom;
-            animation: flame-flicker 0.7s infinite alternate; /* Animación de parpadeo */
-        }
+    /* Flamas */
+    .flame {
+      fill: orange;
+      stroke: red;
+      stroke-width: 0.5;
+      transform-origin: center bottom;
+      filter: blur(0.5px);
+      animation: flicker 0.4s infinite alternate;
+    }
 
-        .flame.off {
-            animation: flame-off 0.5s forwards; /* Animación de apagado */
-            opacity: 0;
-        }
+    .flame.off {
+      animation: flame-off 0.5s forwards;
+    }
 
-        .candle-number {
-            font-family: 'Comic Sans MS', cursive; /* Fuente divertida */
-            font-size: 45px;
-            font-weight: bold;
-            fill: #FFFFFF; /* Blanco para los números */
-            text-anchor: middle;
-            animation: draw-number 1s ease-out forwards;
-        }
+    @keyframes flicker {
+      0% { transform: scale(1) translateY(0); opacity: 1; }
+      50% { transform: scale(1.1) translateY(-2px); opacity: 0.9; }
+      100% { transform: scale(0.95) translateY(0); opacity: 1; }
+    }
 
-        /* Animaciones de dibujo */
-        @keyframes draw-cake {
-            from {
-                stroke-dasharray: 1000;
-                stroke-dashoffset: 1000;
-            }
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-        @keyframes draw-candle {
-            from {
-                stroke-dasharray: 200;
-                stroke-dashoffset: 200;
-            }
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-        @keyframes draw-wick {
-            from {
-                stroke-dasharray: 50;
-                stroke-dashoffset: 50;
-            }
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-        @keyframes draw-number {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Animación de la llama */
-        @keyframes flame-flicker {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.9; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes flame-off {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.1); opacity: 0; }
-        }
-    </style>
+    @keyframes flame-off {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0.2); opacity: 0; }
+    }
+  </style>
 </head>
 <body>
 
-    <div id="tsparticles"></div>
-    
-    <div id="mensaje">
-        Feliz cumpleaños amor mio, pide un deseo
-    </div>
+  <div id="mensaje">Pide tu deseo amor mio</div>
 
-    <div id="pastel-container">
-        <svg id="pastel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
-            <path class="cake-layer" d="M50 250 C150 350, 350 350, 450 250 L450 300 C350 400, 150 400, 50 300 Z" />
-            <path class="cake-layer" d="M50 250 Q250 150, 450 250 L450 200 Q250 100, 50 200 Z" transform="translate(0, -50)" />
-            <path class="cake-layer" d="M50 200 Q250 100, 450 200 L450 150 Q250 50, 50 150 Z" transform="translate(0, -100)" />
-            
-            <rect class="candle-body" x="160" y="80" width="20" height="60" rx="5" ry="5" />
-            <line class="candle-wick" x1="170" y1="80" x2="170" y2="70" />
-            <path class="flame" id="flame1" d="M170 70 L165 75 C160 80, 170 85, 175 80 C180 75, 170 70, 170 70 Z" />
-            <text class="candle-number" x="170" y="125">2</text>
+  <div id="pastel-container">
+    <svg id="pastel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+      <!-- Capas del pastel -->
+      <path class="cake-layer" d="M50 250 C150 350, 350 350, 450 250 L450 300 C350 400, 150 400, 50 300 Z" />
+      <path class="cake-layer" d="M50 250 Q250 150, 450 250 L450 200 Q250 100, 50 200 Z" transform="translate(0, -50)" />
+      <path class="cake-layer" d="M50 200 Q250 100, 450 200 L450 150 Q250 50, 50 150 Z" transform="translate(0, -100)" />
+      
+      <!-- Vela izquierda -->
+      <rect class="candle-body" x="160" y="80" width="20" height="60" rx="5" ry="5"/>
+      <line class="candle-wick" x1="170" y1="80" x2="170" y2="70"/>
+      <path class="flame" id="flame1" d="M170 70 L165 75 C160 80, 170 85, 175 80 C180 75, 170 70, 170 70 Z"/>
+      
+      <!-- Vela derecha -->
+      <rect class="candle-body" x="320" y="80" width="20" height="60" rx="5" ry="5"/>
+      <line class="candle-wick" x1="330" y1="80" x2="330" y2="70"/>
+      <path class="flame" id="flame2" d="M330 70 L325 75 C320 80, 330 85, 335 80 C340 75, 330 70, 330 70 Z"/>
+    </svg>
+  </div>
 
-            <rect class="candle-body" x="320" y="80" width="20" height="60" rx="5" ry="5" />
-            <line class="candle-wick" x1="330" y1="80" x2="330" y2="70" />
-            <path class="flame" id="flame2" d="M330 70 L325 75 C320 80, 330 85, 335 80 C340 75, 330 70, 330 70 Z" />
-            <text class="candle-number" x="330" y="125">3</text>
-        </svg>
-    </div>
+  <script>
+    // Apagar velas al hacer clic en el pastel
+    const pastel = document.getElementById("pastel-container");
+    const llamas = document.querySelectorAll(".flame");
 
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.min.js"></script>
-
-    <script>
-        // Configuración para el confeti y fuegos artificiales de tsParticles
-        const confettiOptions = {
-            particles: {
-                number: { value: 0 },
-                color: { value: ["#FF5A73", "#FF9B5A", "#FFD75A", "#5AFFB1", "#5A94FF", "#9B5AFF"] },
-                shape: { type: ["circle", "square", "triangle", "polygon"] },
-                opacity: { value: { min: 0.1, max: 1 } },
-                size: { value: { min: 2, max: 5 } },
-                links: { enable: false },
-                move: {
-                    enable: true,
-                    speed: 20,
-                    direction: "bottom",
-                    random: true,
-                    straight: false,
-                    outModes: "destroy",
-                },
-            },
-            fullScreen: { enable: true, zIndex: -1 },
-            detectRetina: true,
-            emitters: {
-                direction: "top",
-                rate: { delay: 0.1, quantity: 10 },
-                life: { duration: 0.5, count: 1 },
-                size: { width: 100, height: 100 },
-                position: { x: 50, y: 100 },
-            },
-        };
-
-        // Inicializa tsParticles
-        tsParticles.load({ id: "tsparticles", options: confettiOptions });
-
-        // Evento para activar el confeti con un clic
-        let isFirstClick = true;
-        document.body.addEventListener('click', () => {
-            if (isFirstClick) {
-                // Al primer clic, se activa el confeti y se resetea la variable
-                tsParticles.load({ id: "tsparticles", options: confettiOptions });
-                isFirstClick = false;
-            } else {
-                // Para clics subsiguientes, solo actualiza para reiniciar el efecto
-                tsParticles.load({ id: "tsparticles", options: confettiOptions });
-            }
-        });
-
-        // Apagar las velas al hacer clic en el pastel
-        const pastelContainer = document.getElementById('pastel-container');
-        const llamas = document.querySelectorAll('.flame');
-
-        pastelContainer.addEventListener('click', () => {
-            llamas.forEach(llama => {
-                llama.classList.add('off'); // Agrega la clase 'off' para la animación de apagado
-            });
-        });
-    </script>
+    pastel.addEventListener("click", () => {
+      llamas.forEach(llama => {
+        llama.classList.add("off");
+      });
+    });
+  </script>
 </body>
 </html>
