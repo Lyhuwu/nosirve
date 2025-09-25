@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -24,7 +24,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            pointer-events: none; /* Permite clics a través del canvas */
         }
 
         #mensaje {
@@ -33,62 +33,146 @@
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
             z-index: 10;
+            margin-bottom: 20px;
+        }
+
+        #pastel-container {
+            width: 350px; /* Tamaño más grande para el pastel */
+            height: auto;
+            position: relative;
+            cursor: pointer;
+            z-index: 9; /* Asegura que el pastel esté sobre el confeti */
         }
 
         #pastel {
-            cursor: pointer;
-            width: 300px;
-            height: auto;
-            margin-top: 20px;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Estilos base del SVG del pastel y velas */
+        .cake-layer {
+            fill: #B0E0E6; /* Azul bajito del pastel */
+            stroke: #87CEFA;
+            stroke-width: 3;
+            animation: draw-cake 2s ease-out forwards;
         }
         
-        .vela {
-            fill: yellow;
-            stroke: black;
+        .candle-body {
+            fill: #FFD700; /* Oro para las velas */
+            stroke: #DAA520;
             stroke-width: 2;
+            animation: draw-candle 1.5s ease-out forwards;
         }
 
-        /* Animación para las velas */
-        .llama {
+        .candle-wick {
+            stroke: #36454F; /* Gris oscuro para la mecha */
+            stroke-width: 1;
+            animation: draw-wick 1s ease-out forwards;
+        }
+
+        .flame {
             fill: orange;
-            stroke: none;
-            animation: flame-flicker 1s infinite;
+            stroke: red;
+            stroke-width: 0.5;
+            transform-origin: center bottom;
+            animation: flame-flicker 0.7s infinite alternate; /* Animación de parpadeo */
         }
 
+        .flame.off {
+            animation: flame-off 0.5s forwards; /* Animación de apagado */
+            opacity: 0;
+        }
+
+        .candle-number {
+            font-family: 'Comic Sans MS', cursive; /* Fuente divertida */
+            font-size: 45px;
+            font-weight: bold;
+            fill: #FFFFFF; /* Blanco para los números */
+            text-anchor: middle;
+            animation: draw-number 1s ease-out forwards;
+        }
+
+        /* Animaciones de dibujo */
+        @keyframes draw-cake {
+            from {
+                stroke-dasharray: 1000;
+                stroke-dashoffset: 1000;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        @keyframes draw-candle {
+            from {
+                stroke-dasharray: 200;
+                stroke-dashoffset: 200;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        @keyframes draw-wick {
+            from {
+                stroke-dasharray: 50;
+                stroke-dashoffset: 50;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        @keyframes draw-number {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animación de la llama */
         @keyframes flame-flicker {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes flame-off {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.1); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div id="confetti-container"></div>
+    <canvas id="confetti-container"></canvas>
     
     <div id="mensaje">
         Feliz cumpleaños amor mio, pide un deseo
     </div>
 
-    <svg id="pastel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
-        <path d="M50 250 Q250 350, 450 250" fill="#B0E0E6" stroke="#87CEFA" stroke-width="5" />
-        <rect x="50" y="150" width="400" height="100" fill="#B0E0E6" stroke="#87CEFA" stroke-width="5" />
-        
-        <rect class="vela" x="150" y="100" width="20" height="50" rx="5" ry="5" />
-        <rect class="vela" x="330" y="100" width="20" height="50" rx="5" ry="5" />
-        
-        <circle class="llama" id="llama1" cx="160" cy="95" r="8" />
-        <circle class="llama" id="llama2" cx="340" cy="95" r="8" />
+    <div id="pastel-container">
+        <svg id="pastel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+            <path class="cake-layer" d="M50 250 C150 350, 350 350, 450 250 L450 300 C350 400, 150 400, 50 300 Z" />
+            <path class="cake-layer" d="M50 250 Q250 150, 450 250 L450 200 Q250 100, 50 200 Z" transform="translate(0, -50)" />
+            <path class="cake-layer" d="M50 200 Q250 100, 450 200 L450 150 Q250 50, 50 150 Z" transform="translate(0, -100)" />
+            
+            <rect class="candle-body" x="160" y="80" width="20" height="60" rx="5" ry="5" />
+            <line class="candle-wick" x1="170" y1="80" x2="170" y2="70" />
+            <path class="flame" id="flame1" d="M170 70 L165 75 C160 80, 170 85, 175 80 C180 75, 170 70, 170 70 Z" />
+            <text class="candle-number" x="170" y="125">2</text>
 
-        <text id="numero2" x="160" y="130" font-family="Arial" font-size="60" font-weight="bold" fill="white" text-anchor="middle" />
-        <text id="numero3" x="340" y="130" font-family="Arial" font-size="60" font-weight="bold" fill="white" text-anchor="middle" />
-    </svg>
+            <rect class="candle-body" x="320" y="80" width="20" height="60" rx="5" ry="5" />
+            <line class="candle-wick" x1="330" y1="80" x2="330" y2="70" />
+            <path class="flame" id="flame2" d="M330 70 L325 75 C320 80, 330 85, 335 80 C340 75, 330 70, 330 70 Z" />
+            <text class="candle-number" x="330" y="125">3</text>
+        </svg>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
     <script>
-        const confeti = new ConfettiGenerator({ target: 'confetti-container' });
-        let confetiAnimacionActiva = false;
-        
-        // Carga los datos del JSON
+        // Carga los datos del JSON (directamente en JS para simplificar en GitHub Pages)
         const datos = {
             "cumpleaños": {
                 "nombre_homenajeado": "Amor mío",
@@ -97,35 +181,48 @@
             },
             "configuracion_visual": {
                 "color_fondo": "#ADD8E6",
-                "color_pastel": "#B0E0E6",
-                "url_confeti": "https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"
+                "color_pastel": "#B0E0E6"
             }
         };
 
-        // Asigna el número 23 a las velas
-        document.getElementById('numero2').textContent = datos.cumpleaños.edad.toString()[0];
-        document.getElementById('numero3').textContent = datos.cumpleaños.edad.toString()[1];
+        // Inicializa el confeti
+        const confettiSettings = { target: 'confetti-container' };
+        const confetti = new ConfettiGenerator(confettiSettings);
+        
+        // Función para activar el confeti
+        function activarConfeti() {
+            confetti.render();
+            setTimeout(() => {
+                confetti.clear(); // Limpia el confeti después de un tiempo
+            }, 5000); // 5 segundos
+        }
 
-        // Animación de confeti al primer toque/click
+        // Activar confeti automáticamente al cargar la página
+        window.addEventListener('load', activarConfeti);
+
+        // También activar confeti con el primer click en el body (si no se activó antes o para repetir)
+        let firstClick = true;
         document.body.addEventListener('click', () => {
-            if (!confetiAnimacionActiva) {
-                confeti.render();
-                confetiAnimacionActiva = true;
+            if (firstClick) {
+                activarConfeti();
+                firstClick = false; // Solo una vez automático, después por click
+            } else {
+                activarConfeti(); // Permite repetir el confeti al hacer clic
             }
         });
 
-        // Animación de apagar velas
-        const pastel = document.getElementById('pastel');
-        const llamas = document.querySelectorAll('.llama');
+        // Apagar las velas al hacer clic en el pastel
+        const pastelContainer = document.getElementById('pastel-container');
+        const llamas = document.querySelectorAll('.flame');
 
-        pastel.addEventListener('click', () => {
+        pastelContainer.addEventListener('click', () => {
             llamas.forEach(llama => {
-                // Detiene la animación de parpadeo y oculta las llamas
-                llama.style.animation = 'none';
-                llama.style.display = 'none';
+                llama.classList.add('off'); // Agrega la clase 'off' para la animación de apagado
             });
             // Opcional: Mostrar un mensaje después de apagar las velas
-            alert("¡Deseo pedido!");
+            setTimeout(() => {
+                alert("¡Deseo pedido! ¡Feliz cumpleaños!");
+            }, 600); // Espera a que la animación termine
         });
     </script>
 </body>
