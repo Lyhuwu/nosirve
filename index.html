@@ -3,119 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pide tu deseo amor mio</title>
-  <style>
-    body {
-      background-color: #0f57ff;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: 'Comic Sans MS', cursive;
-      color: white;
-      overflow: hidden;
-    }
-
-    #mensaje {
-      text-align: center;
-      font-size: 2.5em;
-      font-weight: bold;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-      z-index: 10;
-    }
-
-    #pastel-container {
-      width: 350px;
-      cursor: pointer;
-      z-index: 9;
-    }
-
-    svg {
-      width: 100%;
-      height: auto;
-    }
-
-    /* Pastel */
-    .cake-layer {
-      fill: #ffb6c1;
-      stroke: #ff7f9f;
-      stroke-width: 3;
-    }
-
-    /* Velas */
-    .candle-body {
-      fill: #fffacd;
-      stroke: #f5d742;
-      stroke-width: 2;
-    }
-
-    .candle-wick {
-      stroke: #222;
-      stroke-width: 2;
-    }
-
-    /* Flamas */
-    .flame {
-      fill: orange;
-      stroke: red;
-      stroke-width: 0.5;
-      transform-origin: center bottom;
-      filter: blur(0.5px);
-      animation: flicker 0.4s infinite alternate;
-    }
-
-    .flame.off {
-      animation: flame-off 0.5s forwards;
-    }
-
-    @keyframes flicker {
-      0% { transform: scale(1) translateY(0); opacity: 1; }
-      50% { transform: scale(1.1) translateY(-2px); opacity: 0.9; }
-      100% { transform: scale(0.95) translateY(0); opacity: 1; }
-    }
-
-    @keyframes flame-off {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(0.2); opacity: 0; }
-    }
-  </style>
+  <title>Feliz Cumpleaños</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="mensaje">Pide tu deseo amor mio</div>
+  <p>Feliz cumpleaños amor mio</p>
+  <p>pide un deseo</p>
 
-  <div id="pastel-container">
-    <svg id="pastel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
-      <!-- Capas del pastel -->
-      <path class="cake-layer" d="M50 250 C150 350, 350 350, 450 250 L450 300 C350 400, 150 400, 50 300 Z" />
-      <path class="cake-layer" d="M50 250 Q250 150, 450 250 L450 200 Q250 100, 50 200 Z" transform="translate(0, -50)" />
-      <path class="cake-layer" d="M50 200 Q250 100, 450 200 L450 150 Q250 50, 50 150 Z" transform="translate(0, -100)" />
-      
-      <!-- Vela izquierda -->
-      <rect class="candle-body" x="160" y="80" width="20" height="60" rx="5" ry="5"/>
-      <line class="candle-wick" x1="170" y1="80" x2="170" y2="70"/>
-      <path class="flame" id="flame1" d="M170 70 L165 75 C160 80, 170 85, 175 80 C180 75, 170 70, 170 70 Z"/>
-      
-      <!-- Vela derecha -->
-      <rect class="candle-body" x="320" y="80" width="20" height="60" rx="5" ry="5"/>
-      <line class="candle-wick" x1="330" y1="80" x2="330" y2="70"/>
-      <path class="flame" id="flame2" d="M330 70 L325 75 C320 80, 330 85, 335 80 C340 75, 330 70, 330 70 Z"/>
-    </svg>
+  <div class="box">
+    <div class="plate"></div>
+
+    <div class="layer">
+      <div class="fill"></div>
+    </div>
+    <div class="layer">
+      <div class="fill"></div>
+    </div>
+
+    <div class="icing">
+      <div class="icing-sm"></div>
+      <div class="icing-sm"></div>
+      <div class="icing-sm"></div>
+      <div class="icing-sm"></div>
+      <div class="icing-sm"></div>
+      <div class="icing-sm"></div>
+    </div>
+
+    <div class="candles">
+      <div class="candle">
+        <div class="flame"></div>
+      </div>
+      <div class="candle">
+        <div class="flame"></div>
+      </div>
+      <div class="candle">
+        <div class="flame"></div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // Apagar velas al hacer clic en el pastel
-    const pastel = document.getElementById("pastel-container");
-    const llamas = document.querySelectorAll(".flame");
-
-    pastel.addEventListener("click", () => {
-      llamas.forEach(llama => {
-        llama.classList.add("off");
-      });
-    });
-  </script>
+  <!-- Script para apagar las velas -->
+  <script src="script.js"></script>
 </body>
 </html>
