@@ -1,109 +1,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Lienzo Kinopio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feliz Cumpleaños 💙</title>
   <style>
     body {
       margin: 0;
-      background: #f9f9f9;
-      font-family: 'Poppins', sans-serif; /* Fuente similar a la de Kinopio */
+      background-color: #002b80; /* Azul fuerte */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Arial', sans-serif;
+      color: white;
+      overflow: hidden;
+      flex-direction: column;
     }
-    #canvas {
+
+    .cake {
       position: relative;
-      width: 3000px;
-      height: 2000px;
-      background: white;
-      margin: 50px auto;
-      border: 2px dashed pink;
-      overflow: visible;
+      width: 200px;
+      height: 150px;
+      background: #ffb3b3;
+      border-radius: 10px 10px 0 0;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-    .node {
+
+    .cake::before {
+      content: '';
       position: absolute;
-      box-sizing: border-box;
-      padding: 8px;
-      white-space: pre-wrap;
-      overflow-wrap: break-word;
-      font-family: 'Poppins', sans-serif; /* Cambiar fuente */
-      border-radius: 12px;
-      background-color: #fff;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 40px;
+      background: #ff9999;
+      border-radius: 10px;
     }
-    .node img {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 0; /* Sin borde, solo la imagen */
-      display: block;
+
+    .candle {
+      position: absolute;
+      width: 10px;
+      height: 30px;
+      background: white;
+      top: -50px;
+      border-radius: 2px;
     }
-    .node iframe {
-      width: 100%;
-      height: 80px;
-      border: none;
+
+    .candle:nth-child(1) { left: 30px; }
+    .candle:nth-child(2) { left: 90px; }
+    .candle:nth-child(3) { left: 150px; }
+
+    .flame {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 20px;
+      background: orange;
+      border-radius: 50% 50% 50% 50%;
+      animation: flicker 0.3s infinite;
+      opacity: 1;
     }
-    .node p {
-      margin: 0;
+
+    @keyframes flicker {
+      0% { transform: translateX(-50%) scale(1); opacity: 1; }
+      50% { transform: translateX(-50%) scale(1.1); opacity: 0.8; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    #wishMessage {
+      display: none;
+      margin-top: 40px;
+      font-size: 2em;
+      animation: fadeIn 2s forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div id="canvas"></div>
+
+  <div class="cake" onclick="makeWish()">
+    <div class="candle">
+      <div class="flame"></div>
+    </div>
+    <div class="candle">
+      <div class="flame"></div>
+    </div>
+    <div class="candle">
+      <div class="flame"></div>
+    </div>
+  </div>
+
+  <div id="wishMessage">🎂 Pide un deseo 🎉</div>
 
   <script>
-    // Cargar los datos del canvas
-    fetch('https://raw.githubusercontent.com/Lyhuwu/Feliz-aniversario-amor-mio/refs/heads/main/Ayayayayaay.canvas')
-      .then(res => res.json())
-      .then(data => {
-        const canvas = document.getElementById('canvas');
-
-        // Iterar sobre cada nodo en el canvas
-        data.nodes.forEach(node => {
-          const div = document.createElement('div');
-          div.className = 'node';
-          div.style.left = node.x + 'px';
-          div.style.top = node.y + 'px';
-          div.style.width = node.width + 'px';
-          div.style.height = node.height + 'px';
-          div.style.backgroundColor = node.color || '#f0f0f0';
-          
-          const text = node.text.trim();
-
-          // Si el nodo es una imagen (por ejemplo, un gif o imagen estática)
-          if (text.match(/\.(jpg|jpeg|png|gif)$/i)) {
-            const img = document.createElement('img');
-            img.src = text;
-            div.appendChild(img);
-          }
-          // Si es un link de Spotify
-          else if (text.includes('open.spotify.com')) {
-            const iframe = document.createElement('iframe');
-            iframe.src = text.replace('/track/', '/embed/track/');
-            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            iframe.loading = 'lazy';
-            div.appendChild(iframe);
-          }
-          // Si es un enlace que no es imagen ni Spotify, lo tratamos como texto
-          else {
-            // Creamos un párrafo para el texto
-            const p = document.createElement('p');
-            p.innerText = text;
-            div.appendChild(p);
-
-            // Ajustamos la tarjeta para que se ajuste al tamaño del texto
-            div.style.width = 'auto';
-            div.style.height = 'auto';
-            div.style.padding = '12px';
-            div.style.backgroundColor = '#f9f9f9';  // Fondo de la tarjeta
-            div.style.border = '1px solid #ccc';  // Borde de la tarjeta
-            div.style.borderRadius = '12px';  // Bordes redondeados
-          }
-
-          // Añadir el nodo al canvas
-          canvas.appendChild(div);
-        });
-      })
-      .catch(error => {
-        console.error("Error al cargar los datos del canvas:", error);
-      });
+    function makeWish() {
+      const flames = document.querySelectorAll('.flame');
+      flames.forEach(flame => flame.style.display = 'none');
+      document.getElementById('wishMessage').style.display = 'block';
+    }
   </script>
+
 </body>
 </html>
