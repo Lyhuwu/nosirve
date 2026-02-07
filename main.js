@@ -25,7 +25,7 @@ if (startBtn && overlay) {
     });
 }
 
-// --- 2. ESCENA 3D BÁSICA ---
+// --- 2. ESCENA 3D ---
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
@@ -33,13 +33,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 camera.position.z = 100;
 
-// --- ILUMINACIÓN (Para los nuevos planetas 3D) ---
-// Luz ambiental suave azulada
+// --- ILUMINACIÓN ---
 const ambientLight = new THREE.AmbientLight(0x404040, 2); 
 scene.add(ambientLight);
-// Luz direccional fuerte (como un sol distante)
 const sunLight = new THREE.DirectionalLight(0xffffff, 3);
-sunLight.position.set(50, 30, 50); // Posición arriba y a la derecha
+sunLight.position.set(50, 30, 50);
 scene.add(sunLight);
 
 // --- EFECTO BLOOM ---
@@ -60,73 +58,42 @@ starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3)
 const backgroundStars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xa0c4ff, size: 0.09 }));
 scene.add(backgroundStars);
 
-
-// ==========================================
 // --- MINI UNIVERSOS (PLANETAS AMBIENTALES) ---
-// ==========================================
-const ambientPlanets = []; // Array para guardarlos y animarlos
+const ambientPlanets = []; 
 
-// Función auxiliar para crear planetas de hielo (brillantes)
 function createIcyPlanet(size, x, y, z) {
     const geo = new THREE.SphereGeometry(size, 32, 32);
-    // MeshStandardMaterial reacciona a la luz
-    const mat = new THREE.MeshStandardMaterial({
-        color: 0xa0e0ff, // Azul hielo claro
-        roughness: 0.2,  // Muy liso
-        metalness: 0.8,  // Metálico/Reflectante
-    });
+    const mat = new THREE.MeshStandardMaterial({ color: 0xa0e0ff, roughness: 0.2, metalness: 0.8 });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(x, y, z);
     scene.add(mesh);
     ambientPlanets.push(mesh);
 }
 
-// Función auxiliar para crear planeta con anillos
 function createRingedPlanet(size, x, y, z) {
     const planetGroup = new THREE.Group();
-
-    // El planeta central
     const sphereGeo = new THREE.SphereGeometry(size, 32, 32);
-    const sphereMat = new THREE.MeshStandardMaterial({
-        color: 0x4682b4, // Azul acero
-        roughness: 0.7,
-        flatShading: true // Estilo facetado "low poly"
-    });
+    const sphereMat = new THREE.MeshStandardMaterial({ color: 0x4682b4, roughness: 0.7, flatShading: true });
     const planet = new THREE.Mesh(sphereGeo, sphereMat);
     planetGroup.add(planet);
-
-    // El anillo
     const ringGeo = new THREE.RingGeometry(size * 1.4, size * 2, 64);
-    const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x87cefa,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.6
-    });
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x87cefa, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
     const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.rotation.x = Math.PI / 2; // Acostar el anillo
+    ring.rotation.x = Math.PI / 2;
     planetGroup.add(ring);
-
     planetGroup.position.set(x, y, z);
-    // Inclinar un poco el planeta entero para que se vea mejor
     planetGroup.rotation.x = 0.5;
     planetGroup.rotation.z = 0.2;
-
     scene.add(planetGroup);
     ambientPlanets.push(planetGroup);
 }
 
-// --- COLOCACIÓN DE LOS PLANETAS ---
-// Colocamos planetas grandes lejos de la constelación central
-createRingedPlanet(6, 40, 25, -30);  // Gigante anillado arriba derecha
-createIcyPlanet(4, -50, -20, -10);   // Planeta de hielo abajo izquierda
-createIcyPlanet(2, -30, 40, 20);     // Luna pequeña arriba izquierda
-createIcyPlanet(3, 60, -40, 0);      // Otro planeta abajo derecha
+createRingedPlanet(6, 40, 25, -30);
+createIcyPlanet(4, -50, -20, -10);
+createIcyPlanet(2, -30, 40, 20);
+createIcyPlanet(3, 60, -40, 0);
 
-// ==========================================
-
-
-// --- CONSTELACIÓN SOFI (DATOS) ---
+// --- CONSTELACIÓN SOFI ---
 const sofPoints = [
     // S
     { pos: [-16, 6, 0], text: "El inicio de nuestra historia ❤️", img: "fotos/foto1.jpg", link: "" },
@@ -151,18 +118,30 @@ const sofPoints = [
     { pos: [12, 7, 0], text: "Tú eres mi estrella más brillante", img: "", link: "" }
 ];
 
-const memoryObjects = [];
+const visualObjects = []; // Aquí guardamos las esferas visibles para animarlas
+const hitObjects = [];    // Aquí guardamos las esferas invisibles para detectarlas
+
 const lineMat = new THREE.LineBasicMaterial({ color: 0x87cefa, transparent: true, opacity: 0.3 });
 const starBaseMaterial = new THREE.MeshBasicMaterial({ color: 0xe0ffff });
+// Material invisible para el hitbox
+const hitMaterial = new THREE.MeshBasicMaterial({ visible: false }); 
 
 for (let i = 0; i < sofPoints.length; i++) {
     const p = sofPoints[i];
     if (p.text !== "") {
-        const mesh = new THREE.Mesh(new THREE.SphereGeometry(1.1, 24, 24), starBaseMaterial.clone());
-        mesh.position.set(...p.pos);
-        mesh.userData = { text: p.text, img: p.img, link: p.link };
-        scene.add(mesh);
-        memoryObjects.push(mesh);
+        // 1. ESFERA VISUAL (Pequeña y bonita: 0.6)
+        const visualMesh = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 24), starBaseMaterial.clone());
+        visualMesh.position.set(...p.pos);
+        scene.add(visualMesh);
+        visualObjects.push(visualMesh);
+
+        // 2. ESFERA FANTASMA (Grande e invisible: 2.5) -> Esta recibe el clic
+        const hitMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), hitMaterial);
+        hitMesh.position.set(...p.pos);
+        // Guardamos los datos en la esfera fantasma
+        hitMesh.userData = { text: p.text, img: p.img, link: p.link }; 
+        scene.add(hitMesh);
+        hitObjects.push(hitMesh);
     }
     const saltos = [4, 9, 13]; 
     if (i < sofPoints.length - 1 && !saltos.includes(i)) {
@@ -171,7 +150,7 @@ for (let i = 0; i < sofPoints.length; i++) {
     }
 }
 
-// --- CONTROLES Y TOUCH ---
+// --- CONTROLES ---
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
@@ -179,6 +158,7 @@ controls.enablePan = false;
 controls.autoRotate = false;
 controls.autoRotateSpeed = 0.8; 
 
+// --- INTERACCIÓN ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -207,7 +187,9 @@ window.addEventListener('pointerup', (e) => {
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(memoryObjects);
+    
+    // IMPORTANTE: El raycaster ahora busca en hitObjects (las esferas grandes invisibles)
+    const intersects = raycaster.intersectObjects(hitObjects);
 
     if (intersects.length > 0) {
         const data = intersects[0].object.userData;
@@ -238,13 +220,12 @@ function animate() {
 
     backgroundStars.rotation.y += 0.0001;
 
-    // Animación de los nuevos planetas ambientales
     ambientPlanets.forEach((planet, i) => {
-        // Rotación lenta sobre su propio eje Y
-        planet.rotation.y += 0.002 * (i % 2 === 0 ? 1 : -1); // Unos giran para un lado, otros para el otro
+        planet.rotation.y += 0.002 * (i % 2 === 0 ? 1 : -1);
     });
 
-    memoryObjects.forEach((obj, i) => {
+    // Animamos las esferas visuales (las pequeñas)
+    visualObjects.forEach((obj, i) => {
         obj.scale.setScalar(1 + Math.sin(time * 2 + i) * 0.1);
         const hue = 0.55 + Math.sin(time * 0.5 + i) * 0.05; 
         obj.material.color.setHSL(hue, 0.7, 0.8);
