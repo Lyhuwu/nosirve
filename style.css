@@ -1,7 +1,7 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: black;
+  background: radial-gradient(circle at bottom, #020111, #000000);
   font-family: Arial, sans-serif;
 }
 
@@ -9,9 +9,11 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
 .oculto {
@@ -19,14 +21,20 @@ body {
 }
 
 .contenido {
-  background: #111;
+  background: rgba(20, 20, 40, 0.9);
   color: white;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 300px;
+  padding: 25px;
+  border-radius: 18px;
+  max-width: 280px;
   text-align: center;
+  box-shadow: 0 0 30px rgba(255, 200, 255, 0.4);
 }
 
 button {
-  margin-top: 10px;
+  margin-top: 15px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: #ffb6e6;
+  font-size: 14px;
 }
