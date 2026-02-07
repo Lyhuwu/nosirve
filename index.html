@@ -7,20 +7,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="intro-overlay">
+        <div class="intro-content">
+            <h2 class="typewriter">Dicen que el universo es infinito...</h2>
+            <h2 class="typewriter delay">pero yo encontré su centro en ti.</h2>
+            <p class="intro-subtext">
+                Cada risa, cada foto y cada canción son estrellas solitarias,<br>
+                pero juntas, forman la única constelación que importa: <b>Tú</b>.
+            </p>
+            <button id="start-btn">Entrar a nuestra galaxia</button>
+        </div>
+    </div>
+
     <div id="ui-container">
         <h1 class="title">Sofi</h1>
-        <p class="subtitle">Nuestra historia escrita en las estrellas</p>
     </div>
 
     <div id="memory-modal" class="hidden">
         <div class="modal-content">
-            <span id="close-modal">&times;</span>
+            <span id="close-modal">×</span>
             <div id="memory-body">
                 <img id="memory-img" src="" alt="Recuerdo" class="hidden">
                 <p id="memory-text"></p>
-                <a id="memory-link" href="#" target="_blank" class="music-btn hidden">
-                    Escuchar nuestra canción 🎵
-                </a>
+                <a id="memory-link" href="#" target="_blank" class="music-btn hidden">Escuchar canción 🎵</a>
             </div>
         </div>
     </div>
