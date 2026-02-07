@@ -6,7 +6,8 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 
 // --- VARIABLES DE CONTROL ---
 let gameStarted = false;
-let targetZ = 55; 
+let targetZ = 60; // Distancia perfecta para ver todo
+let introAnimationFinished = false; 
 let autoRotateTimer = null; 
 let isDragging = false;
 let startX = 0;
@@ -31,7 +32,9 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-camera.position.z = 100;
+
+// 🚀 POSICIÓN INICIAL (LEJOS): Para ver los planetas al entrar
+camera.position.z = 140; 
 
 // --- ILUMINACIÓN ---
 const ambientLight = new THREE.AmbientLight(0x404040, 2); 
@@ -50,15 +53,15 @@ composer.addPass(bloomPass);
 
 // --- FONDO DE ESTRELLAS ---
 const starCoords = [];
-for(let i=0; i<4000; i++) {
-    starCoords.push(THREE.MathUtils.randFloatSpread(350), THREE.MathUtils.randFloatSpread(350), THREE.MathUtils.randFloatSpread(350));
+for(let i=0; i<5000; i++) {
+    starCoords.push(THREE.MathUtils.randFloatSpread(400), THREE.MathUtils.randFloatSpread(400), THREE.MathUtils.randFloatSpread(400));
 }
 const starGeo = new THREE.BufferGeometry();
 starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
 const backgroundStars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xa0c4ff, size: 0.09 }));
 scene.add(backgroundStars);
 
-// --- MINI UNIVERSOS (PLANETAS AMBIENTALES) ---
+// --- MINI UNIVERSOS (PLANETAS) ---
 const ambientPlanets = []; 
 
 function createIcyPlanet(size, x, y, z) {
@@ -92,6 +95,11 @@ createRingedPlanet(6, 40, 25, -30);
 createIcyPlanet(4, -50, -20, -10);
 createIcyPlanet(2, -30, 40, 20);
 createIcyPlanet(3, 60, -40, 0);
+createRingedPlanet(8, -70, 50, -60);
+createIcyPlanet(5, 80, 20, -40);
+createIcyPlanet(1.5, -20, -60, 40);
+createRingedPlanet(4, 50, -50, -20);
+createIcyPlanet(2.5, 0, 70, -50);
 
 // --- CONSTELACIÓN SOFI ---
 const sofPoints = [
@@ -118,27 +126,24 @@ const sofPoints = [
     { pos: [12, 7, 0], text: "Tú eres mi estrella más brillante", img: "", link: "" }
 ];
 
-const visualObjects = []; // Aquí guardamos las esferas visibles para animarlas
-const hitObjects = [];    // Aquí guardamos las esferas invisibles para detectarlas
+const visualObjects = []; 
+const hitObjects = [];
 
 const lineMat = new THREE.LineBasicMaterial({ color: 0x87cefa, transparent: true, opacity: 0.3 });
 const starBaseMaterial = new THREE.MeshBasicMaterial({ color: 0xe0ffff });
-// Material invisible para el hitbox
 const hitMaterial = new THREE.MeshBasicMaterial({ visible: false }); 
 
 for (let i = 0; i < sofPoints.length; i++) {
     const p = sofPoints[i];
     if (p.text !== "") {
-        // 1. ESFERA VISUAL (Pequeña y bonita: 0.6)
+        // Visual (Pequeña)
         const visualMesh = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 24), starBaseMaterial.clone());
         visualMesh.position.set(...p.pos);
         scene.add(visualMesh);
         visualObjects.push(visualMesh);
-
-        // 2. ESFERA FANTASMA (Grande e invisible: 2.5) -> Esta recibe el clic
+        // Hitbox (Grande)
         const hitMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), hitMaterial);
         hitMesh.position.set(...p.pos);
-        // Guardamos los datos en la esfera fantasma
         hitMesh.userData = { text: p.text, img: p.img, link: p.link }; 
         scene.add(hitMesh);
         hitObjects.push(hitMesh);
@@ -150,22 +155,28 @@ for (let i = 0; i < sofPoints.length; i++) {
     }
 }
 
-// --- CONTROLES ---
+// --- CONTROLES AUTOMÁTICOS (ESTILO ANTERIOR) ---
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.enablePan = false;
-controls.autoRotate = false;
-controls.autoRotateSpeed = 0.8; 
+controls.enablePan = false; // No dejamos que se mueva lateralmente (así no se pierde)
+controls.enableZoom = true;
+controls.minDistance = 20;  // No puede acercarse tanto que rompa la ilusión
+controls.maxDistance = 150; // No puede alejarse al infinito
+controls.autoRotate = false; // Empieza apagado, se prende al llegar
+controls.autoRotateSpeed = 0.8; // Velocidad de giro suave
 
-// --- INTERACCIÓN ---
+// --- INTERACCIÓN Y "REGRESO" ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 window.addEventListener('pointerdown', (e) => {
     if (!gameStarted) return;
+    
+    // 1. AL TOCAR: FRENAMOS TODO
     controls.autoRotate = false;
     if (autoRotateTimer) clearTimeout(autoRotateTimer);
+    
     isDragging = false;
     startX = e.clientX;
     startY = e.clientY;
@@ -180,15 +191,20 @@ window.addEventListener('pointermove', (e) => {
 
 window.addEventListener('pointerup', (e) => {
     if (!gameStarted) return;
+    
+    // 2. AL SOLTAR: PREPARAMOS EL "REGRESO" (Auto-Giro)
     if (autoRotateTimer) clearTimeout(autoRotateTimer);
-    autoRotateTimer = setTimeout(() => { controls.autoRotate = true; }, 3000);
+    // Esperamos 3 segundos y reactivamos el giro
+    autoRotateTimer = setTimeout(() => {
+        controls.autoRotate = true; 
+    }, 3000);
+
     if (isDragging) return;
 
+    // DETECCIÓN DE CLIC
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    
-    // IMPORTANTE: El raycaster ahora busca en hitObjects (las esferas grandes invisibles)
     const intersects = raycaster.intersectObjects(hitObjects);
 
     if (intersects.length > 0) {
@@ -211,20 +227,22 @@ function animate() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
-    if (gameStarted) {
-        camera.position.z += (targetZ - camera.position.z) * 0.02;
-        if (!controls.autoRotate && Math.abs(camera.position.z - targetZ) < 0.5 && !autoRotateTimer) {
-             if (!isDragging) controls.autoRotate = true;
+    // 🎥 CÁMARA DE ENTRADA
+    if (gameStarted && !introAnimationFinished) {
+        camera.position.z += (targetZ - camera.position.z) * 0.015;
+        
+        // Cuando llega, activamos el GIRO AUTOMÁTICO
+        if (Math.abs(camera.position.z - targetZ) < 0.5) {
+            introAnimationFinished = true;
+            controls.autoRotate = true; // ¡Aquí empieza a girar sola!
         }
     }
 
     backgroundStars.rotation.y += 0.0001;
-
     ambientPlanets.forEach((planet, i) => {
         planet.rotation.y += 0.002 * (i % 2 === 0 ? 1 : -1);
     });
 
-    // Animamos las esferas visuales (las pequeñas)
     visualObjects.forEach((obj, i) => {
         obj.scale.setScalar(1 + Math.sin(time * 2 + i) * 0.1);
         const hue = 0.55 + Math.sin(time * 0.5 + i) * 0.05; 
