@@ -6,8 +6,6 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 
 // --- VARIABLES DE CONTROL ---
 let gameStarted = false;
-let targetZ = 60; // Distancia perfecta para ver todo
-let introAnimationFinished = false; 
 let autoRotateTimer = null; 
 let isDragging = false;
 let startX = 0;
@@ -22,6 +20,8 @@ if (startBtn && overlay) {
         setTimeout(() => {
              overlay.classList.add('fade-out');
              gameStarted = true;
+             // Al entrar, activamos la rotación suave inmediatamente
+             controls.autoRotate = true; 
         }, 1200);
     });
 }
@@ -33,7 +33,7 @@ const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg')
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// 🚀 POSICIÓN INICIAL (LEJOS): Para ver los planetas al entrar
+// 🚀 POSICIÓN PANORÁMICA: Empieza lejos para ver los planetas
 camera.position.z = 140; 
 
 // --- ILUMINACIÓN ---
@@ -91,6 +91,7 @@ function createRingedPlanet(size, x, y, z) {
     ambientPlanets.push(planetGroup);
 }
 
+// Planetas distribuidos
 createRingedPlanet(6, 40, 25, -30);
 createIcyPlanet(4, -50, -20, -10);
 createIcyPlanet(2, -30, 40, 20);
@@ -136,12 +137,11 @@ const hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
 for (let i = 0; i < sofPoints.length; i++) {
     const p = sofPoints[i];
     if (p.text !== "") {
-        // Visual (Pequeña)
         const visualMesh = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 24), starBaseMaterial.clone());
         visualMesh.position.set(...p.pos);
         scene.add(visualMesh);
         visualObjects.push(visualMesh);
-        // Hitbox (Grande)
+        
         const hitMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), hitMaterial);
         hitMesh.position.set(...p.pos);
         hitMesh.userData = { text: p.text, img: p.img, link: p.link }; 
@@ -155,25 +155,25 @@ for (let i = 0; i < sofPoints.length; i++) {
     }
 }
 
-// --- CONTROLES AUTOMÁTICOS (ESTILO ANTERIOR) ---
+// --- CONTROLES MANUALES CON AUTO-GIRO ---
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.enablePan = false; // No dejamos que se mueva lateralmente (así no se pierde)
+controls.enablePan = false; 
 controls.enableZoom = true;
-controls.minDistance = 20;  // No puede acercarse tanto que rompa la ilusión
-controls.maxDistance = 150; // No puede alejarse al infinito
-controls.autoRotate = false; // Empieza apagado, se prende al llegar
-controls.autoRotateSpeed = 0.8; // Velocidad de giro suave
+controls.minDistance = 20; 
+controls.maxDistance = 200; // Suficiente para alejarse y ver todo
+controls.autoRotate = false; // Se activa al dar click en empezar
+controls.autoRotateSpeed = 0.8; 
 
-// --- INTERACCIÓN Y "REGRESO" ---
+// --- INTERACCIÓN ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 window.addEventListener('pointerdown', (e) => {
     if (!gameStarted) return;
     
-    // 1. AL TOCAR: FRENAMOS TODO
+    // Frenar al tocar
     controls.autoRotate = false;
     if (autoRotateTimer) clearTimeout(autoRotateTimer);
     
@@ -192,16 +192,14 @@ window.addEventListener('pointermove', (e) => {
 window.addEventListener('pointerup', (e) => {
     if (!gameStarted) return;
     
-    // 2. AL SOLTAR: PREPARAMOS EL "REGRESO" (Auto-Giro)
+    // Reactivar giro automático tras 3 segundos
     if (autoRotateTimer) clearTimeout(autoRotateTimer);
-    // Esperamos 3 segundos y reactivamos el giro
     autoRotateTimer = setTimeout(() => {
         controls.autoRotate = true; 
     }, 3000);
 
     if (isDragging) return;
 
-    // DETECCIÓN DE CLIC
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
@@ -227,16 +225,8 @@ function animate() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
-    // 🎥 CÁMARA DE ENTRADA
-    if (gameStarted && !introAnimationFinished) {
-        camera.position.z += (targetZ - camera.position.z) * 0.015;
-        
-        // Cuando llega, activamos el GIRO AUTOMÁTICO
-        if (Math.abs(camera.position.z - targetZ) < 0.5) {
-            introAnimationFinished = true;
-            controls.autoRotate = true; // ¡Aquí empieza a girar sola!
-        }
-    }
+    // YA NO HAY CÓDIGO DE ZOOM AUTOMÁTICO AQUÍ
+    // La cámara se queda donde el usuario la deje (o en z=140 al inicio)
 
     backgroundStars.rotation.y += 0.0001;
     ambientPlanets.forEach((planet, i) => {
