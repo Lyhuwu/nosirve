@@ -1,41 +1,89 @@
 body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #020205; font-family: 'Segoe UI', sans-serif; }
 #bg { position: fixed; top: 0; left: 0; z-index: 1; }
 
+/* --- INTRO TIPO PERGAMINO --- */
 #intro-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle, #1a1a2e 0%, #020205 100%);
-    display: flex; align-items: center; justify-content: center; z-index: 1000; transition: opacity 2s ease;
+    background: radial-gradient(circle at center, #0a0a14 0%, #000000 100%); /* Fondo más oscuro para contraste */
+    display: flex; align-items: center; justify-content: center; z-index: 1000; transition: opacity 1.5s ease;
+    padding: 20px; box-sizing: border-box;
 }
 
-.intro-content { text-align: center; color: white; padding: 20px; }
+/* Diseño del Pergamino */
+.scroll-design {
+    background: #f4e4bc; /* Color papiro/crema */
+    color: #3a2a1a; /* Texto marrón oscuro para contraste */
+    padding: 30px 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 60px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 90%;
+    max-height: 85vh; /* Evita que se salga de la pantalla en vertical */
+    overflow-y: auto; /* Permite scroll dentro del pergamino si es necesario */
+    text-align: center;
+    border: 2px solid #d4c49c;
+    position: relative;
+}
 
-/* Máquina de escribir */
+/* Efecto decorativo superior e inferior del pergamino (opcional) */
+.scroll-design::before, .scroll-design::after {
+    content: ''; position: absolute; left: 5%; width: 90%; height: 5px;
+    background: rgba(0,0,0,0.1); border-radius: 50%;
+}
+.scroll-design::before { top: 10px; }
+.scroll-design::after { bottom: 10px; }
+
+/* Ajuste de textos para móvil */
 .typewriter {
-    overflow: hidden; border-right: .15em solid #ff69b4; white-space: nowrap; 
-    margin: 0 auto; letter-spacing: .15em; font-size: 1.8rem;
+    font-family: 'Courier New', monospace; /* Fuente tipo máquina */
+    overflow: hidden; border-right: .15em solid #87cefa; /* Cursor Azul */
+    white-space: nowrap; margin: 0 auto 10px; letter-spacing: .05em;
+    font-size: clamp(1rem, 4vw, 1.6rem); /* Tamaño dinámico más pequeño */
     animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
-    max-width: fit-content; margin-bottom: 10px;
+    max-width: fit-content; color: #000;
 }
 .typewriter.delay { animation: typing 3.5s steps(40, end) 4s forwards, blink-caret .75s step-end infinite 4s; opacity: 0; }
-.typewriter.delay { animation-fill-mode: forwards; }
-
 @keyframes typing { from { width: 0; opacity: 1; } to { width: 100%; opacity: 1; } }
-@keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #ff69b4; } }
+@keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #87cefa; } }
 
-.intro-subtext { font-size: 1.1rem; opacity: 0.8; margin: 40px 0; font-style: italic; animation: fadeIn 2s ease 8s forwards; opacity: 0; }
-@keyframes fadeIn { to { opacity: 0.8; } }
-
-#start-btn { 
-    background: transparent; border: 1px solid #ff69b4; color: #ff69b4; padding: 12px 30px; 
-    border-radius: 50px; cursor: pointer; transition: 0.3s; opacity: 0; animation: fadeIn 2s ease 10s forwards;
+.intro-subtext {
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    line-height: 1.5;
+    opacity: 0.9; margin: 30px 0; font-style: italic;
+    animation: fadeIn 2s ease 8s forwards; opacity: 0;
+    color: #5a4a3a;
 }
-#start-btn:hover { background: #ff69b4; color: white; box-shadow: 0 0 20px #ff69b4; }
 
-/* UI y Modal igual que antes */
-.title { position: relative; font-size: clamp(2.5rem, 10vw, 5rem); letter-spacing: 20px; text-transform: uppercase; color: #fff; text-shadow: 0 0 15px #ff69b4; pointer-events: none; z-index: 10; margin-top: 5vh; text-align: center;}
-#memory-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(15px); padding: 30px; border-radius: 20px; border: 1px solid #ff69b4; color: white; width: 85%; max-width: 350px; text-align: center; }
-#memory-img { width: 100%; border-radius: 10px; margin-bottom: 15px; }
-.music-btn { display: inline-block; margin-top: 15px; padding: 10px 20px; background: #1DB954; color: white; text-decoration: none; border-radius: 50px; font-weight: bold; }
+#start-btn {
+    background: transparent; border: 2px solid #87cefa; /* Azul suave */
+    color: #87cefa; padding: 12px 30px;
+    border-radius: 50px; cursor: pointer; transition: 0.3s;
+    opacity: 0; animation: fadeIn 2s ease 9s forwards;
+    font-weight: bold; background: rgba(255,255,255,0.1);
+}
+#start-btn:hover { background: #87cefa; color: white; box-shadow: 0 0 15px #87cefa; }
+
+/* --- UI PRINCIPAL Y MODAL (Colores Azules) --- */
+.title {
+    position: relative; font-size: clamp(3rem, 12vw, 6rem); letter-spacing: 15px;
+    text-transform: uppercase; color: #e0ffff; /* Blanco azulado */
+    text-shadow: 0 0 15px #87cefa, 0 0 30px #4682b4; /* Sombras azules */
+    pointer-events: none; z-index: 10; margin-top: 5vh; text-align: center;
+}
+#memory-modal {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 100; background: rgba(10, 15, 25, 0.95); backdrop-filter: blur(15px);
+    padding: 30px; border-radius: 20px; border: 1px solid #87cefa; /* Borde Azul */
+    color: #e0ffff; width: 85%; max-width: 350px; text-align: center;
+}
+#memory-img { width: 100%; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(135, 206, 250, 0.3); }
+.music-btn {
+    display: inline-block; margin-top: 15px; padding: 10px 25px;
+    background: #1DB954; color: white; text-decoration: none;
+    border-radius: 50px; font-weight: bold; transition: 0.3s;
+}
+.music-btn:hover { transform: scale(1.05); background: #1ed760; box-shadow: 0 0 15px #1ed760; }
+#close-modal { position: absolute; top: 10px; right: 20px; cursor: pointer; font-size: 28px; color: #87cefa; }
 .hidden { display: none !important; }
 .fade-out { opacity: 0; pointer-events: none; }
-#close-modal { position: absolute; top: 10px; right: 20px; cursor: pointer; font-size: 24px; color: #ff69b4; }
+@keyframes fadeIn { to { opacity: 1; } }
