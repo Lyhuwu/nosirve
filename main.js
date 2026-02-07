@@ -7,42 +7,47 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 // --- VARIABLES DE CONTROL ---
 let gameStarted = false;
 let targetZ = 55; 
-let autoRotateTimer = null; // Para reiniciar el giro automático
-let isDragging = false; // Para distinguir clic de arrastre
+let autoRotateTimer = null; 
+let isDragging = false;
 let startX = 0;
 let startY = 0;
 
-// --- 1. LÓGICA DE INTERFAZ (BOTÓN DE INICIO) ---
+// --- 1. LÓGICA DE INTERFAZ ---
 const startBtn = document.getElementById('start-btn');
 const overlay = document.getElementById('intro-overlay');
-
 if (startBtn && overlay) {
     startBtn.addEventListener('click', () => {
-        // Animación de salida del pergamino
         overlay.classList.add('rolling-up');
-        // Esperar a que termine la animación visual
         setTimeout(() => {
              overlay.classList.add('fade-out');
-             gameStarted = true; // ¡Comienza el viaje!
+             gameStarted = true;
         }, 1200);
     });
 }
 
-// --- 2. ESCENA 3D ---
+// --- 2. ESCENA 3D BÁSICA ---
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
-
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimización para móviles
-camera.position.z = 100; // Posición inicial lejana
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+camera.position.z = 100;
 
-// --- EFECTO BLOOM (RESPLANDOR) ---
+// --- ILUMINACIÓN (Para los nuevos planetas 3D) ---
+// Luz ambiental suave azulada
+const ambientLight = new THREE.AmbientLight(0x404040, 2); 
+scene.add(ambientLight);
+// Luz direccional fuerte (como un sol distante)
+const sunLight = new THREE.DirectionalLight(0xffffff, 3);
+sunLight.position.set(50, 30, 50); // Posición arriba y a la derecha
+scene.add(sunLight);
+
+// --- EFECTO BLOOM ---
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
 bloomPass.threshold = 0.1;
-bloomPass.strength = 1.8; // Intensidad del brillo
+bloomPass.strength = 1.8;
 composer.addPass(bloomPass);
 
 // --- FONDO DE ESTRELLAS ---
@@ -54,6 +59,72 @@ const starGeo = new THREE.BufferGeometry();
 starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
 const backgroundStars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xa0c4ff, size: 0.09 }));
 scene.add(backgroundStars);
+
+
+// ==========================================
+// --- MINI UNIVERSOS (PLANETAS AMBIENTALES) ---
+// ==========================================
+const ambientPlanets = []; // Array para guardarlos y animarlos
+
+// Función auxiliar para crear planetas de hielo (brillantes)
+function createIcyPlanet(size, x, y, z) {
+    const geo = new THREE.SphereGeometry(size, 32, 32);
+    // MeshStandardMaterial reacciona a la luz
+    const mat = new THREE.MeshStandardMaterial({
+        color: 0xa0e0ff, // Azul hielo claro
+        roughness: 0.2,  // Muy liso
+        metalness: 0.8,  // Metálico/Reflectante
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    scene.add(mesh);
+    ambientPlanets.push(mesh);
+}
+
+// Función auxiliar para crear planeta con anillos
+function createRingedPlanet(size, x, y, z) {
+    const planetGroup = new THREE.Group();
+
+    // El planeta central
+    const sphereGeo = new THREE.SphereGeometry(size, 32, 32);
+    const sphereMat = new THREE.MeshStandardMaterial({
+        color: 0x4682b4, // Azul acero
+        roughness: 0.7,
+        flatShading: true // Estilo facetado "low poly"
+    });
+    const planet = new THREE.Mesh(sphereGeo, sphereMat);
+    planetGroup.add(planet);
+
+    // El anillo
+    const ringGeo = new THREE.RingGeometry(size * 1.4, size * 2, 64);
+    const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x87cefa,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.6
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2; // Acostar el anillo
+    planetGroup.add(ring);
+
+    planetGroup.position.set(x, y, z);
+    // Inclinar un poco el planeta entero para que se vea mejor
+    planetGroup.rotation.x = 0.5;
+    planetGroup.rotation.z = 0.2;
+
+    scene.add(planetGroup);
+    ambientPlanets.push(planetGroup);
+}
+
+// --- COLOCACIÓN DE LOS PLANETAS ---
+// Colocamos planetas grandes lejos de la constelación central
+createRingedPlanet(6, 40, 25, -30);  // Gigante anillado arriba derecha
+createIcyPlanet(4, -50, -20, -10);   // Planeta de hielo abajo izquierda
+createIcyPlanet(2, -30, 40, 20);     // Luna pequeña arriba izquierda
+createIcyPlanet(3, 60, -40, 0);      // Otro planeta abajo derecha
+
+// ==========================================
+
 
 // --- CONSTELACIÓN SOFI (DATOS) ---
 const sofPoints = [
@@ -81,16 +152,12 @@ const sofPoints = [
 ];
 
 const memoryObjects = [];
-// Líneas azul cielo transparentes
 const lineMat = new THREE.LineBasicMaterial({ color: 0x87cefa, transparent: true, opacity: 0.3 });
-// Material base de estrella
 const starBaseMaterial = new THREE.MeshBasicMaterial({ color: 0xe0ffff });
 
-// CREACIÓN DE OBJETOS 3D
 for (let i = 0; i < sofPoints.length; i++) {
     const p = sofPoints[i];
     if (p.text !== "") {
-        // Aumentamos el tamaño de la esfera (1.1) para que sea fácil tocarla en móvil
         const mesh = new THREE.Mesh(new THREE.SphereGeometry(1.1, 24, 24), starBaseMaterial.clone());
         mesh.position.set(...p.pos);
         mesh.userData = { text: p.text, img: p.img, link: p.link };
@@ -104,108 +171,81 @@ for (let i = 0; i < sofPoints.length; i++) {
     }
 }
 
-// --- CONTROLES DE CÁMARA ---
+// --- CONTROLES Y TOUCH ---
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.enablePan = false; // Deshabilitar paneo para no perder el centro
-controls.autoRotate = false; // Empieza quieto
+controls.enablePan = false;
+controls.autoRotate = false;
 controls.autoRotateSpeed = 0.8; 
 
-// --- GESTIÓN DE INTERACCIÓN TÁCTIL (TOUCH) ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-// 1. AL TOCAR LA PANTALLA (Pointer Down)
 window.addEventListener('pointerdown', (e) => {
     if (!gameStarted) return;
-    
-    // Detener rotación automática inmediatamente
     controls.autoRotate = false;
     if (autoRotateTimer) clearTimeout(autoRotateTimer);
-
-    // Guardar posición inicial para detectar si es clic o arrastre
     isDragging = false;
     startX = e.clientX;
     startY = e.clientY;
 });
 
-// 2. AL MOVER EL DEDO (Pointer Move)
 window.addEventListener('pointermove', (e) => {
     if (!gameStarted) return;
-    
-    // Si se mueve más de 5 pixeles, es un arrastre (no un clic)
     if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
         isDragging = true;
     }
 });
 
-// 3. AL LEVANTAR EL DEDO (Pointer Up) - AQUÍ OCURRE EL CLIC
 window.addEventListener('pointerup', (e) => {
     if (!gameStarted) return;
-
-    // Reiniciar rotación automática después de 3 segundos de inactividad
     if (autoRotateTimer) clearTimeout(autoRotateTimer);
-    autoRotateTimer = setTimeout(() => {
-        controls.autoRotate = true;
-    }, 3000);
-
-    // Si fue un arrastre, no hacemos nada más (solo rotamos cámara)
+    autoRotateTimer = setTimeout(() => { controls.autoRotate = true; }, 3000);
     if (isDragging) return;
 
-    // SI FUE UN TOQUE LIMPIO (CLIC), BUSCAMOS ESTRELLAS
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(memoryObjects);
 
     if (intersects.length > 0) {
-        // ¡ESTRELLA TOCADA!
         const data = intersects[0].object.userData;
-        
-        // Llenar el modal con la info
         document.getElementById('memory-text').innerText = data.text;
         const imgEl = document.getElementById('memory-img');
         const linkEl = document.getElementById('memory-link');
-        
         if(data.img) { imgEl.src = data.img; imgEl.classList.remove('hidden'); } else { imgEl.classList.add('hidden'); }
         if(data.link) { linkEl.href = data.link; linkEl.classList.remove('hidden'); } else { linkEl.classList.add('hidden'); }
-        
-        // Mostrar modal
         document.getElementById('memory-modal').classList.remove('hidden');
     }
 });
 
-// Cerrar modal
 document.getElementById('close-modal').onclick = () => {
     document.getElementById('memory-modal').classList.add('hidden');
 };
 
-// --- BUCLE DE ANIMACIÓN ---
+// --- ANIMACIÓN ---
 function animate() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
     if (gameStarted) {
-        // Zoom suave de entrada (Viaje inicial)
         camera.position.z += (targetZ - camera.position.z) * 0.02;
-
-        // Si la cámara llega a su destino y nadie está tocando, activar rotación inicial
         if (!controls.autoRotate && Math.abs(camera.position.z - targetZ) < 0.5 && !autoRotateTimer) {
-             // Solo activar si no hay un temporizador pendiente
              if (!isDragging) controls.autoRotate = true;
         }
     }
 
-    // Rotación lenta del fondo de estrellas
     backgroundStars.rotation.y += 0.0001;
 
-    // Animación de latido y color en la constelación
+    // Animación de los nuevos planetas ambientales
+    ambientPlanets.forEach((planet, i) => {
+        // Rotación lenta sobre su propio eje Y
+        planet.rotation.y += 0.002 * (i % 2 === 0 ? 1 : -1); // Unos giran para un lado, otros para el otro
+    });
+
     memoryObjects.forEach((obj, i) => {
-        // Latido
         obj.scale.setScalar(1 + Math.sin(time * 2 + i) * 0.1);
-        // Cambio de color suave (Azules y Blancos)
         const hue = 0.55 + Math.sin(time * 0.5 + i) * 0.05; 
         obj.material.color.setHSL(hue, 0.7, 0.8);
     });
@@ -215,7 +255,6 @@ function animate() {
 }
 animate();
 
-// Ajuste de ventana
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
