@@ -5,56 +5,68 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 const scene = new THREE.Scene();
+// Ajusté la cámara un poco más lejos para que quepa mejor en móvil
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
+renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.z = 45;
+camera.position.z = 55;
 
+// --- BLOOM (Resplandor Azulado) ---
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
+// Ajusté el umbral para que el brillo azul se note más
 const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-bloomPass.strength = 1.8;
+bloomPass.threshold = 0.1;
+bloomPass.strength = 2.0;
 composer.addPass(bloomPass);
 
-// --- FONDO LENTO ---
+// --- FONDO ESTRELLAS ---
 const starCoords = [];
 for(let i=0; i<4000; i++) {
-    starCoords.push(THREE.MathUtils.randFloatSpread(300), THREE.MathUtils.randFloatSpread(300), THREE.MathUtils.randFloatSpread(300));
+    starCoords.push(THREE.MathUtils.randFloatSpread(350), THREE.MathUtils.randFloatSpread(350), THREE.MathUtils.randFloatSpread(350));
 }
 const starGeo = new THREE.BufferGeometry();
 starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
-const backgroundStars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.08 }));
+// Estrellas de fondo blancas/azuladas
+const backgroundStars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xa0c4ff, size: 0.09 }));
 scene.add(backgroundStars);
 
-// --- CONSTELACIÓN SOFI ---
+// --- CONSTELACIÓN SOFI (Colores Nuevos) ---
 const sofPoints = [
+    // S
     { pos: [-16, 6, 0], text: "El inicio de nuestra historia ❤️", img: "fotos/foto1.jpg", link: "" },
     { pos: [-19, 3, 0], text: "Esta canción me recuerda a ti", img: "", link: "https://spotify.com" },
     { pos: [-16, 0, 0], text: "Cada momento es especial", img: "fotos/foto2.jpg", link: "" },
     { pos: [-13, -3, 0], text: "Tu sonrisa es mi motor", img: "", link: "" },
     { pos: [-16, -6, 0], text: "S de Siempre", img: "", link: "" },
+    // O
     { pos: [-8, 4, 0], text: "Tus ojos son galaxias", img: "", link: "" },
     { pos: [-3, 4, 0], text: "Nuestra canción favorita", img: "", link: "https://youtube.com" },
     { pos: [-3, -4, 0], text: "Un recuerdo inolvidable", img: "fotos/foto3.jpg", link: "" },
     { pos: [-8, -4, 0], text: "Tú y yo, por siempre", img: "", link: "" },
     { pos: [-8, 4, 0], text: "" },
+    // F
     { pos: [2, 6, 0], text: "Felicidad es estar contigo", img: "", link: "" },
     { pos: [2, -6, 0], text: "Favorito recuerdo", img: "fotos/foto4.jpg", link: "" },
     { pos: [2, 0, 0], text: "Nuestra playlist", img: "", link: "https://spotify.com" },
     { pos: [7, 0, 0], text: "Fue el destino", img: "", link: "" },
+    // I
     { pos: [12, 4, 0], text: "Increíble Sofi", img: "", link: "" },
     { pos: [12, -6, 0], text: "Inolvidable", img: "", link: "" },
     { pos: [12, 7, 0], text: "Tú eres mi estrella más brillante", img: "", link: "" }
 ];
 
 const memoryObjects = [];
-const lineMat = new THREE.LineBasicMaterial({ color: 0xff69b4, transparent: true, opacity: 0.4 });
+// Material de línea: Azul cielo claro (#87cefa) y transparente
+const lineMat = new THREE.LineBasicMaterial({ color: 0x87cefa, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+
+// Material base de estrella: Blanco azulado (#e0ffff)
+const starBaseMaterial = new THREE.MeshBasicMaterial({ color: 0xe0ffff });
 
 for (let i = 0; i < sofPoints.length; i++) {
     const p = sofPoints[i];
     if (p.text !== "") {
-        // Usamos MeshStandardMaterial para que el color pueda cambiar suavemente
-        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.75, 24, 24), new THREE.MeshBasicMaterial({ color: 0xff1493 }));
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.75, 24, 24), starBaseMaterial.clone());
         mesh.position.set(...p.pos);
         mesh.userData = { text: p.text, img: p.img, link: p.link };
         scene.add(mesh);
@@ -91,21 +103,21 @@ document.getElementById('start-btn').onclick = () => document.getElementById('in
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.autoRotate = true; // Añadí rotación automática suave
+controls.autoRotateSpeed = 0.5;
 
 function animate() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
-    
-    // Movimiento muy lento del fondo
-    backgroundStars.rotation.y += 0.0003;
-    backgroundStars.rotation.x += 0.0001;
+    backgroundStars.rotation.y += 0.0002;
 
-    // Estrellas de Sofi: Latido y cambio de color suave
     memoryObjects.forEach((obj, i) => {
-        obj.scale.setScalar(1 + Math.sin(time * 2 + i) * 0.15);
-        // Cambio de color suave (oscila entre rosa y púrpura/blanco)
-        const hue = (Math.sin(time * 0.5 + i) * 0.1) + 0.9; // Rango de color
-        obj.material.color.setHSL(hue, 1, 0.5);
+        // Latido suave
+        obj.scale.setScalar(1 + Math.sin(time * 2 + i) * 0.1);
+        // Cambio de color suave entre azules y blancos
+        // HSL: Hue (tono azul ~0.6), Saturation (baja para que sea suave), Lightness (alta para brillo)
+        const hue = 0.55 + Math.sin(time * 0.5 + i) * 0.05; // Oscila en tonos azules
+        obj.material.color.setHSL(hue, 0.7, 0.8);
     });
 
     controls.update();
