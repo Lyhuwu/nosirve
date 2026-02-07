@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Nuestra Galaxia 💖</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Three.js -->
-  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sofi | Nuestra Galaxia</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="ui-container">
+        <h1 class="title">Sofi</h1>
+        <p class="subtitle">Nuestra constelación eterna</p>
+    </div>
 
-<div id="mensaje" class="oculto">
-  <div
+    <div id="memory-modal" class="hidden">
+        <div class="modal-content">
+            <span id="close-modal">&times;</span>
+            <div id="memory-body">
+                <p id="memory-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="bg"></canvas>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
