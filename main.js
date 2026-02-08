@@ -33,7 +33,7 @@ const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg')
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// 🚀 POSICIÓN PANORÁMICA: Empieza lejos para ver los planetas
+// 🚀 POSICIÓN PANORÁMICA: Empieza lejos (z=140) para ver los planetas
 camera.position.z = 140; 
 
 // --- ILUMINACIÓN ---
@@ -102,29 +102,29 @@ createIcyPlanet(1.5, -20, -60, 40);
 createRingedPlanet(4, 50, -50, -20);
 createIcyPlanet(2.5, 0, 70, -50);
 
-// --- CONSTELACIÓN SOFI ---
+// --- CONSTELACIÓN SOFI (CORREGIDA Y LISTA) ---
 const sofPoints = [
     // S
-    { pos: [-16, 6, 0], text: "El inicio de nuestra historia ❤️", img: "fotos/foto1.jpg", link: "" },
+    { pos: [-16, 6, 0], text: "Nuestra primera vez juntitas❤️", img: "fotos/foto1.jpg", link: "" },
     { pos: [-19, 3, 0], text: "Esta canción me recuerda a ti", img: "", link: "https://spotify.com" },
-    { pos: [-16, 0, 0], text: "Cada momento es especial", img: "fotos/foto2.jpg", link: "" },
-    { pos: [-13, -3, 0], text: "Tu sonrisa es mi motor", img: "", link: "" },
-    { pos: [-16, -6, 0], text: "S de Siempre", img: "", link: "" },
+    { pos: [-16, 0, 0], text: "Nuestro mesesito conviviendo juntas, día y noche, 24/7", img: "fotos/foto2.jpg", link: "" },
+    { pos: [-13, -3, 0], text: "Tu carita tan preciosa ayayaya", img: "fotos/foto3.jpg", link: "" },
+    { pos: [-16, -6, 0], text: "Cocinar juntitas", img: "fotos/foto4.jpg", link: "" },
     // O
-    { pos: [-8, 4, 0], text: "Tus ojos son galaxias", img: "", link: "" },
-    { pos: [-3, 4, 0], text: "Nuestra canción favorita", img: "", link: "https://youtube.com" },
-    { pos: [-3, -4, 0], text: "Un recuerdo inolvidable", img: "fotos/foto3.jpg", link: "" },
-    { pos: [-8, -4, 0], text: "Tú y yo, por siempre", img: "", link: "" },
-    { pos: [-8, 4, 0], text: "" },
+    { pos: [-8, 4, 0], text: "Mi estrella con un don tan precioso", img: "fotos/foto5.jpg", link: "" },
+    { pos: [-3, 4, 0], text: "Canción que me recuerda mucho a ti", img: "", link: "https://youtube.com" },
+    { pos: [-3, -4, 0], text: "Jugar nuestros juegos preferidos", img: "fotos/foto6.jpg", link: "" },
+    { pos: [-8, -4, 0], text: "Tú y yo, por siempre", img: "fotos/foto7.jpg", link: "" },
+    { pos: [-8, 4, 0], text: "" }, // Espacio vacío para cerrar la O
     // F
-    { pos: [2, 6, 0], text: "Felicidad es estar contigo", img: "", link: "" },
-    { pos: [2, -6, 0], text: "Favorito recuerdo", img: "fotos/foto4.jpg", link: "" },
-    { pos: [2, 0, 0], text: "Nuestra playlist", img: "", link: "https://spotify.com" },
-    { pos: [7, 0, 0], text: "Fue el destino", img: "", link: "" },
+    { pos: [2, 6, 0], text: "Felicidad es estar contigo", img: "fotos/foto8.jpg", link: "" },
+    { pos: [2, -6, 0], text: "Pasar tiempo y compartir mis días favoritos contigo", img: "fotos/foto9.jpg", link: "" },
+    { pos: [2, 0, 0], text: "Canciones que me recuerdan a ti", img: "", link: "https://spotify.com" },
+    { pos: [7, 0, 0], text: "Verte ser tu misma", img: "fotos/foto10.jpg", link: "" },
     // I
-    { pos: [12, 4, 0], text: "Increíble Sofi", img: "", link: "" },
-    { pos: [12, -6, 0], text: "Inolvidable", img: "", link: "" },
-    { pos: [12, 7, 0], text: "Tú eres mi estrella más brillante", img: "", link: "" }
+    { pos: [12, 4, 0], text: "Sentirme amada sin excepciones", img: "fotos/foto11.jpg", link: "" },
+    { pos: [12, -6, 0], text: "Cualquier cosa me recuerda a ti", img: "fotos/foto12.jpg", link: "" },
+    { pos: [12, 7, 0], text: "Tu existencia alegra mi corazón", img: "fotos/foto13.jpg", link: "" }
 ];
 
 const visualObjects = []; 
@@ -137,13 +137,16 @@ const hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
 for (let i = 0; i < sofPoints.length; i++) {
     const p = sofPoints[i];
     if (p.text !== "") {
+        // Visual
         const visualMesh = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 24), starBaseMaterial.clone());
         visualMesh.position.set(...p.pos);
         scene.add(visualMesh);
         visualObjects.push(visualMesh);
         
+        // Hitbox (Grande)
         const hitMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), hitMaterial);
         hitMesh.position.set(...p.pos);
+        // Usamos la info corregida
         hitMesh.userData = { text: p.text, img: p.img, link: p.link }; 
         scene.add(hitMesh);
         hitObjects.push(hitMesh);
@@ -162,8 +165,8 @@ controls.dampingFactor = 0.05;
 controls.enablePan = false; 
 controls.enableZoom = true;
 controls.minDistance = 20; 
-controls.maxDistance = 200; // Suficiente para alejarse y ver todo
-controls.autoRotate = false; // Se activa al dar click en empezar
+controls.maxDistance = 180; // Un poco más de margen
+controls.autoRotate = false; // Se activa al entrar
 controls.autoRotateSpeed = 0.8; 
 
 // --- INTERACCIÓN ---
@@ -225,8 +228,7 @@ function animate() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
-    // YA NO HAY CÓDIGO DE ZOOM AUTOMÁTICO AQUÍ
-    // La cámara se queda donde el usuario la deje (o en z=140 al inicio)
+    // Sin zoom automático (cámara libre en z=140 al inicio)
 
     backgroundStars.rotation.y += 0.0001;
     ambientPlanets.forEach((planet, i) => {
